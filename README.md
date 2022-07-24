@@ -257,6 +257,7 @@ cscale=ewa_lanczossharp
 interpolation
 tscale=oversample
 ----------------
+SVP CUSTOM SETTINGS
 fs=yes
 --screenshot-webp-lossless=yes
 --override-display-fps=60
@@ -284,11 +285,13 @@ tscale=oversample
 gpu-context=wayland
 osc=no
 osd-bar=no
-PLAY IN MPV
+---------------
+PLAY IN MPV SETTINGS
 ontop=yes
 border=no
 window-scale=0.4
 geometry=100%:100%
+--------------------
 demuxer-max-back-bytes=10000000000
 demuxer-max-bytes=10000000000
 interpolation=yes
