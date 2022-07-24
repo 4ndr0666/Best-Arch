@@ -256,7 +256,7 @@ scale=ewa_lanczossharp
 cscale=ewa_lanczossharp
 interpolation
 tscale=oversample
-```
+----------------
 fs=yes
 --screenshot-webp-lossless=yes
 --override-display-fps=60
