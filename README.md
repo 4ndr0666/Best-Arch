@@ -1,5 +1,28 @@
 # Best-Arch
 My arch config
+
+## Enable weekly fstrim
+
+```bash
+sudo systemctl enable fstrim.timer
+```
+## Enable parallel compilation and compression
+
+Edit `/etc/makepkg.conf`:
+
+- Add the following row (replace 7 with CPU threads-1): `MAKEFLAGS="-j7"`
+- Edit the row saying `COMPRESSXZ=(xz -c -z -)` to `COMPRESSXZ=(xz -c -z - --threads=0)`
+- `sudo pacman -S pigz` and edit the row saying `COMPRESSGZ=(gzip -c -f -n)` to `COMPRESSGZ=(pigz -c -f -n)`
+
+## Intel GPU
+
+### Intel GPU early kernel mode setting
+
+Edit `/etc/mkinitcpio.conf`, add the following at the end of the `MODULES` array: `intel_agp i915`
+
+**NOTE**: on some systems (Intel+AMD GPU) adding `intel_agp` can cause issues with resume from hibernation. [Reference](https://wiki.archlinux.org/title/Kernel_mode_setting#Early_KMS_start).
+
+
 ## Compress initramfs with lz4
 
 Make sure `lz4` is installed.
@@ -412,4 +435,46 @@ volume-max=250
 
 #keepaspect=no
 #save-position-on-quit
+```
+
+
+## Setup libvirt
+
+```bash
+sudo pacman -S libvirt ebtables dnsmasq bridge-utils virt-manager
+sudo gpasswd -a $USERNAME libvirt
+sudo gpasswd -a $USERNAME kvm
+sudo systemctl enable libvirtd
+sudo systemctl start libvirtd
+```
+
+Make sure to relogin after following the steps above. To create a network:
+
+- Open virt-manager
+- Click on *QEMU/KVM*
+- Click *Edit > Connection Details* in the menu
+- Click the *Virtual Networks* tab
+- Click the `+` (plus sign) button in the bottom left corner of the newly opened window
+- Name it whatever
+- Select *NAT* as Mode
+- Leave everything else as it is
+- Click finish
+- To start the network, select it in the sidebar and press the ▶️ (play icon) button
+- To stop the network, press the icon to its left with the 🛑 (stop street sign icon) button (note: the icons could be different depending on the theme)
+- To start the network on boot, select it in the sidebar and toggle the checkbox that says *Autostart: On Boot*
+
+## GNOME Adwaita theme for Qt apps
+
+- Install `qt5ct` from the repos and `adwaita-qt` from the AUR
+- Open up the `qt5ct` application and select your favorite Adwaita flavor with the default color scheme and press apply
+- Add the following to `~/.pam_environment`:
+
+```
+QT_QPA_PLATFORMTHEME=qt5ct
+```
+
+- Add the following to `~/.profile`:
+
+```
+[ "$XDG_CURRENT_DESKTOP" = "KDE" ] || export QT_QPA_PLATFORMTHEME="qt5ct"
 ```
