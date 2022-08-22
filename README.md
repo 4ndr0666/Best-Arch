@@ -123,7 +123,6 @@ Use systemd-swap for automated and dynamic swapfile allocation and use. Consult 
 ...
 Make the script:
 
-```
 #!/bin/bash
 # This command frees only RAM cache
 #echo "echo 3 > /proc/sys/vm/drop_caches"
@@ -132,16 +131,16 @@ su -c "echo 3 >'/proc/sys/vm/drop_caches' && swapoff -a && swapon -a && printf '
 ```
 
 Make it executable:
-,,,
+
 chmod 755 freecache
 ,,,
 
 Make the crontab:
-...
+
 crontab -e
 ...
 Append the below line, save and exit to run it at 2 am daily:
-...
+
 0  2  *  *  *  /usr/local/bin/freecache
 ...
 
