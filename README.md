@@ -117,6 +117,36 @@ sudo rm -f /home/swapfile
 
 Use systemd-swap for automated and dynamic swapfile allocation and use. Consult [the GitHub project page](https://github.com/Nefelim4ag/systemd-swap) for more info.
 
+
+
+## Create a cron tab to automatically free swap and ram cache
+...
+Make the script:
+
+```
+#!/bin/bash
+# This command frees only RAM cache
+#echo "echo 3 > /proc/sys/vm/drop_caches"
+# This command frees RAM cache and swap
+su -c "echo 3 >'/proc/sys/vm/drop_caches' && swapoff -a && swapon -a && printf '\n%s\n' 'Ram-cache and Swap Cleared'" root
+```
+
+Make it executable:
+,,,
+chmod 755 freecache
+,,,
+
+Make the crontab:
+...
+crontab -e
+...
+Append the below line, save and exit to run it at 2 am daily:
+...
+0  2  *  *  *  /usr/local/bin/freecache
+...
+
+
+
 ## Enable Hibernation
 
 [Arch Wiki reference](https://wiki.archlinux.org/index.php/Power_management/Suspend_and_hibernate#Hibernation_into_swap_file)
