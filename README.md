@@ -42,6 +42,28 @@ Edit `/etc/systemd/journald.conf`:
 
 - Uncomment `SystemMaxUse=` and append `200M` (or any size you like).
 
+## Disable core dumps
+
+To improve performance and save disk space.
+
+Edit `/etc/systemd/coredump.conf`, under `[Coredump]` uncomment `Storage=external` and replace it with `Storage=none`. Then run `sudo systemctl daemon-reload`. This alone disables the saving of coredumps but they are still in memory.
+
+If you want to disable core dumps completely add `* hard core 0` to `/etc/security/limits.conf`.
+
+## Enable deep sleep suspension mode
+
+Verify that you're using the inefficient `s2idle` sleep state before continuing:
+
+```bash
+cat /sys/power/mem_sleep
+```
+
+| Inefficient     | Efficient       |
+|-----------------|-----------------|
+| `[s2idle] deep` | `s2idle [deep]` |
+
+Add `mem_sleep_default=deep` to the kernel command line arguments.
+
 ## Change IO Scheduler
 
 ## Change CPU governor
@@ -79,6 +101,45 @@ Create `/etc/udev/rules.d/50-scaling-governor.rules` as follows:
 ```
 SUBSYSTEM=="module", ACTION=="add", KERNEL=="acpi_cpufreq", RUN+=" /bin/sh -c ' echo performance > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor ' "
 ```
+
+## Setting up Plymouth
+
+*NOTE: this setup implies that you use paru (AUR helper), gdm (display manager), and the default arch kernel.*
+
+```bash
+paru -S plymouth-git gdm-plymouth
+```
+
+Edit `/etc/mkinitcpio.conf`:
+
+- In `HOOKS` after `base udev` insert `plymouth`
+- If you're using encryption, in `HOOKS` replace `encrypt` with `plymouth-encrypt`
+- In `MODULES` insert your GPU driver module name as first item
+  - For Intel GPUs: `i915`
+  - For AMD GPUs: `radeon` *(note: this is untested)*
+  - For NVIDIA GPUs: `nvidia` *(note: this is untested)* 
+  - For KVM/qemu VMs: `qxl`
+
+Edit `/boot/loader/entries/arch-linux.conf`: add these arguments in the kernel options (append to the `options` section): `quiet splash loglevel=3 rd.udev.log_priority=3 vt.global_cursor_default=1`
+
+```bash
+sudo systemctl disable gdm
+sudo systemctl enable gdm-plymouth
+sudo mkinitcpio -p linux
+```
+
+
+### Copy monitor layout from user to GDM
+
+GDM doesn't know how you configure your monitors. It just keep its default configuration and most of the time it's not the same of how you have them configured in your session.
+
+To copy your user's monitors configuration over to GDM, use these commands:
+
+```bash
+sudo cp $HOME/.config/monitors.xml /var/lib/gdm/.config/
+sudo chown gdm:gdm /var/lib/gdm/.config/monitors.xml
+```
+
 
 ## Create a swap file
 
@@ -152,6 +213,15 @@ Append the below line, save and exit to run it at 2 am daily:
 
 [Arch Wiki reference](https://wiki.archlinux.org/index.php/Power_management/Suspend_and_hibernate#Hibernation_into_swap_file)
 
+## Enable magic sysreq
+
+Add this line to a file inside `/etc/sysctl.d/` (ie: `99-sysctl.conf`)
+
+```
+kernel.sysrq=1
+```
+
+
 # Package Management
 
 ## Switch to better mirrors
@@ -160,12 +230,8 @@ Append the below line, save and exit to run it at 2 am daily:
 
 ```bash
 sudo pacman -S reflector
-sudo reflector --latest 200 --protocol http --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+sudo reflector --latest 20 --protocol http --protocol https --sort rate --save /etc/pacman.d/mirrorlist
 ```
-
-## Enable colors in pacman
-
-Edit `/etc/pacman.conf` and uncomment the row saying `Color`
 
 ## Enable parallel compilation and compression
 
