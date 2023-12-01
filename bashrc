@@ -22,7 +22,7 @@ export EDITOR=vim
 #fi
 
 #Go Path
-export GOPATH=/home/andro/go
+export GOPATH=/home/$USER/go
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 export GOROOT=/usr/lib/go/src
 
@@ -70,11 +70,6 @@ case :$PATH: in
 	*) PATH=/home/$USER/.local/bin:$PATH ;;
 esac
 
-# Add /home/$USER/andro-env/bin to $PATH
-case :$PATH: in
-	*:/home/$USER/andro-env:*) ;;
-	*) PATH=/home/$USER/andro-env:$PATH ;;
-esac
 
 # exports
 export PATH="${HOME}/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:"
@@ -108,4 +103,3 @@ alias chgrp='chgrp --preserve-root'
 
 # reload bash config
 alias reload="source ~/.bashrc"
-

@@ -102,6 +102,129 @@ Create `/etc/udev/rules.d/50-scaling-governor.rules` as follows:
 SUBSYSTEM=="module", ACTION=="add", KERNEL=="acpi_cpufreq", RUN+=" /bin/sh -c ' echo performance > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor ' "
 ```
 
+
+
+## Manage system resources for better performance
+
+Create the script to optimize system memory and swap usage, freecache.sh:
+
+```bash
+#!/bin/bash
+set -e
+
+# --- // AUTO_ESCALATE:
+if [ "$(id -u)" -ne 0 ]; then
+      sudo "$0" "$@"
+    exit $?
+fi
+
+# Adjust swappiness dynamically based on system conditions
+adjust_swappiness() {
+    local current_swappiness=$(sysctl vm.swappiness | awk '{print $3}')
+    local target_swappiness=60
+    if [[ "$FREE_RAM" -lt 1000 ]]; then
+        target_swappiness=80
+    elif [[ "$FREE_RAM" -gt 2000 ]]; then
+        target_swappiness=40
+    fi
+    [[ "$current_swappiness" -ne "$target_swappiness" ]] && sudo sysctl vm.swappiness="$target_swappiness"
+}
+
+# Clear RAM cache if needed
+clear_ram_cache() {
+    if [ "$FREE_RAM" -lt 500 ]; then
+        sudo sh -c "echo 3 > /proc/sys/vm/drop_caches"
+        echo "RAM cache cleared due to low free memory."
+    fi
+}
+
+# Clear swap if needed
+clear_swap() {
+    if [ "$SWAP_USAGE" -gt 80 ]; then
+        read -p "High swap usage detected. Clear swap? [y/N] " response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            sudo swapoff -a && sudo swapon -a
+            echo "Swap cleared."
+        else
+            echo "Swap clear canceled by user."
+        fi
+    fi
+}
+
+# Main logic
+FREE_RAM=$(free -m | awk '/^Mem:/{print $4}')
+SWAP_USAGE=$(free | awk '/^Swap:/{printf "%.0f", $3/$2 * 100}')
+
+adjust_swappiness
+clear_ram_cache
+clear_swap
+
+echo "Memory and Swap Usage After Operations:"
+free -h
+```
+
+Create the monitoring script that will continuously check the system's free memory and update 'tmp/low_memory' when low.
+
+```bash
+#!/bin/bash
+while true; do
+    FREE_RAM=$(free -m | awk '/^Mem:/{print $4}')
+    if [ "$FREE_RAM" -lt 500 ]; then
+        touch /tmp/low_memory
+    fi
+    sleep 60  # Check every 60 seconds
+done
+```
+
+Now the Systemd Service file for freecache.sh at /etc/systemd/system:
+
+```
+[Unit]
+Description=Free Cache when Memory is Low
+
+[Service]
+Type=oneshot
+ExecStart=/path/to/freecache.sh
+```
+
+And its Path File at /etc/systemd/system:
+
+```
+[Unit]
+Description=Monitor for Low Memory Condition
+
+[Path]
+PathChanged=/tmp/low_memory
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Service file for the monitoring script:
+
+```
+[Unit]
+Description=Monitor Memory Usage
+
+[Service]
+Type=simple
+ExecStart=/path/to/memory_monitor.sh
+
+[Install]
+WantedBy=multi-user.target
+```
+
+And finally, enable and start both the 'memory_monitor.service' and 'freecache.path':
+
+```bash
+sudo systemctl enable memory_monitor.service
+sudo systemctl start memory_monitor.service
+sudo systemctl enable freecache.path
+sudo systemctl start freecache.path
+```
+
+
+
 ## Setting up Plymouth
 
 *NOTE: this setup implies that you use paru (AUR helper), gdm (display manager), and the default arch kernel.*
@@ -117,7 +240,7 @@ Edit `/etc/mkinitcpio.conf`:
 - In `MODULES` insert your GPU driver module name as first item
   - For Intel GPUs: `i915`
   - For AMD GPUs: `radeon` *(note: this is untested)*
-  - For NVIDIA GPUs: `nvidia` *(note: this is untested)* 
+  - For NVIDIA GPUs: `nvidia` *(note: this is untested)*
   - For KVM/qemu VMs: `qxl`
 
 Edit `/boot/loader/entries/arch-linux.conf`: add these arguments in the kernel options (append to the `options` section): `quiet splash loglevel=3 rd.udev.log_priority=3 vt.global_cursor_default=1`
@@ -358,7 +481,7 @@ SVP CUSTOM SETTINGS
 fs=yes
 --screenshot-webp-lossless=yes
 --override-display-fps=60
---loop-file=inf 
+--loop-file=inf
 no-resume-playback
 geometry=50%:50%
 autofit-larger=90%x90%
