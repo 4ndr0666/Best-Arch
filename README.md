@@ -114,9 +114,14 @@ set -e
 
 # --- // AUTO_ESCALATE:
 if [ "$(id -u)" -ne 0 ]; then
-      sudo "$0" "$@"
+    sudo "$0" "$@"
     exit $?
 fi
+
+# Logging function
+log_action() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> /var/log/freecache.log
+}
 
 # Adjust swappiness dynamically based on system conditions
 adjust_swappiness() {
@@ -127,27 +132,25 @@ adjust_swappiness() {
     elif [[ "$FREE_RAM" -gt 2000 ]]; then
         target_swappiness=40
     fi
-    [[ "$current_swappiness" -ne "$target_swappiness" ]] && sudo sysctl vm.swappiness="$target_swappiness"
+    if [[ "$current_swappiness" -ne "$target_swappiness" ]]; then
+        sudo sysctl vm.swappiness="$target_swappiness"
+        log_action "Swappiness adjusted to $target_swappiness"
+    fi
 }
 
 # Clear RAM cache if needed
 clear_ram_cache() {
     if [ "$FREE_RAM" -lt 500 ]; then
         sudo sh -c "echo 3 > /proc/sys/vm/drop_caches"
-        echo "RAM cache cleared due to low free memory."
+        log_action "RAM cache cleared due to low free memory."
     fi
 }
 
 # Clear swap if needed
 clear_swap() {
     if [ "$SWAP_USAGE" -gt 80 ]; then
-        read -p "High swap usage detected. Clear swap? [y/N] " response
-        if [[ "$response" =~ ^[Yy]$ ]]; then
-            sudo swapoff -a && sudo swapon -a
-            echo "Swap cleared."
-        else
-            echo "Swap clear canceled by user."
-        fi
+        sudo swapoff -a && sudo swapon -a
+        log_action "Swap cleared due to high swap usage."
     fi
 }
 
@@ -159,8 +162,8 @@ adjust_swappiness
 clear_ram_cache
 clear_swap
 
-echo "Memory and Swap Usage After Operations:"
-free -h
+log_action "Memory and Swap Usage After Operations:"
+free -h | tee -a /var/log/freecache.log
 ```
 
 Create the monitoring script that will continuously check the system's free memory and update 'tmp/low_memory' when low.
@@ -171,6 +174,8 @@ while true; do
     FREE_RAM=$(free -m | awk '/^Mem:/{print $4}')
     if [ "$FREE_RAM" -lt 500 ]; then
         touch /tmp/low_memory
+    else
+        rm -f /tmp/low_memory
     fi
     sleep 60  # Check every 60 seconds
 done
@@ -180,11 +185,14 @@ Now the Systemd Service file for freecache.sh at /etc/systemd/system:
 
 ```
 [Unit]
-Description=Free Cache when Memory is Low
+Description=Monitor Memory Usage
 
 [Service]
-Type=oneshot
-ExecStart=/path/to/freecache.sh
+Type=simple
+ExecStart=/usr/local/bin/System_utilities/memory_monitor.sh
+
+[Install]
+WantedBy=multi-user.target
 ```
 
 And its Path File at /etc/systemd/system:
@@ -194,7 +202,7 @@ And its Path File at /etc/systemd/system:
 Description=Monitor for Low Memory Condition
 
 [Path]
-PathChanged=/tmp/low_memory
+PathExists=/tmp/low_memory
 
 [Install]
 WantedBy=multi-user.target
@@ -208,7 +216,7 @@ Description=Monitor Memory Usage
 
 [Service]
 Type=simple
-ExecStart=/path/to/memory_monitor.sh
+ExecStart=/usr/local/bin/System_utilities/memory_monitor.sh
 
 [Install]
 WantedBy=multi-user.target
