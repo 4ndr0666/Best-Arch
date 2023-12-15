@@ -103,7 +103,6 @@ SUBSYSTEM=="module", ACTION=="add", KERNEL=="acpi_cpufreq", RUN+=" /bin/sh -c ' 
 ```
 
 
-
 ## Manage system resources for better performance
 
 Create the script to optimize system memory and swap usage, freecache.sh:
@@ -231,6 +230,54 @@ sudo systemctl enable freecache.path
 sudo systemctl start freecache.path
 ```
 
+
+## Setup Arch-Audit Timer for security
+
+Create a new service file, `arch-audit.service`, in `/etc/systemd/system/`.
+
+```bash
+    `sudo nano /etc/systemd/system/arch-audit.service`
+```
+
+Add the following content to the file:
+
+```bash
+    `[Unit] Description=Arch Audit Vulnerability Checking Service
+     [Service] Type=oneshot ExecStart=/usr/bin/arch-audit -u`
+```
+
+Create the Timer File
+
+```bash
+    `sudo nano /etc/systemd/system/arch-audit.timer`
+```
+
+Add the following content to the timer file:
+
+```bash
+    `[Unit] Description=Runs arch-audit daily
+     [Timer] OnCalendar=daily Persistent=true
+     [Install] WantedBy=timers.target`
+```
+
+Start the services
+
+```bash
+    `sudo systemctl daemon-reload`
+    `sudo systemctl enable arch-audit.timer`
+    `sudo systemctl start arch-audit.timer`
+
+*   You can check the status of the timer with:
+
+```bash
+    `sudo systemctl status arch-audit.timer`
+```
+
+*   To see the next scheduled run:
+
+```bash
+    `sudo systemctl list-timers arch-audit.timer`
+```
 
 
 ## Setting up Plymouth
