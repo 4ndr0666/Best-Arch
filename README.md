@@ -131,18 +131,16 @@ Create the script to optimize system memory and swap usage, freecache.sh:
 #!/bin/bash
 set -e
 
-# --- // AUTO_ESCALATE:
+# AUTO_ESCALATE
 if [ "$(id -u)" -ne 0 ]; then
     sudo "$0" "$@"
     exit $?
 fi
 
-# Logging function
 log_action() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> /var/log/freecache.log
 }
 
-# Adjust swappiness dynamically based on system conditions
 adjust_swappiness() {
     local current_swappiness=$(sysctl vm.swappiness | awk '{print $3}')
     local target_swappiness=60
@@ -157,7 +155,6 @@ adjust_swappiness() {
     fi
 }
 
-# Clear RAM cache if needed
 clear_ram_cache() {
     if [ "$FREE_RAM" -lt 500 ]; then
         sudo sh -c "echo 3 > /proc/sys/vm/drop_caches"
@@ -165,7 +162,6 @@ clear_ram_cache() {
     fi
 }
 
-# Clear swap if needed
 clear_swap() {
     if [ "$SWAP_USAGE" -gt 80 ]; then
         sudo swapoff -a && sudo swapon -a
@@ -173,7 +169,6 @@ clear_swap() {
     fi
 }
 
-# Main logic
 FREE_RAM=$(free -m | awk '/^Mem:/{print $4}')
 SWAP_USAGE=$(free | awk '/^Swap:/{printf "%.0f", $3/$2 * 100}')
 
@@ -191,7 +186,8 @@ Create the monitoring script that will continuously check the system's free memo
 #!/bin/bash
 while true; do
     FREE_RAM=$(free -m | awk '/^Mem:/{print $4}')
-    if [ "$FREE_RAM" -lt 500 ]; then
+    # Adjust this threshold as needed, ensuring it's higher than oomd's threshold
+    if [ "$FREE_RAM" -lt 1000 ]; then
         touch /tmp/low_memory
     else
         rm -f /tmp/low_memory
@@ -204,14 +200,15 @@ Now the Systemd Service file for freecache.sh at /etc/systemd/system:
 
 ```
 [Unit]
-Description=Monitor Memory Usage
+Description=Free Cache when Memory is Low
+After=oomd.service  # Ensures this service runs after oomd
 
 [Service]
-Type=simple
-ExecStart=/usr/local/bin/System_utilities/memory_monitor.sh
+Type=oneshot
+ExecStart=/usr/local/bin/System_utilities/freecache.sh
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=
 ```
 
 And its Path File at /etc/systemd/system:
