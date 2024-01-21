@@ -22,7 +22,27 @@ Edit `/etc/mkinitcpio.conf`, add the following at the end of the `MODULES` array
 
 **NOTE**: on some systems (Intel+AMD GPU) adding `intel_agp` can cause issues with resume from hibernation. [Reference](https://wiki.archlinux.org/title/Kernel_mode_setting#Early_KMS_start).
 
+### Fix screen tearing
 
+Edit `/etc/X11/xorg.conf.d/`, add the following conf file: `20-intel.conf`
+
+```bash
+Section "Device"
+     Identifier "Intel Graphics"
+     Driver "intel"
+     Option "TearFree" "true"
+EndSection
+```
+```bash
+sudo mkinitcpio -p linux
+```
+
+### Enable betterscreen suspend service
+
+```bash
+sudo systemctl enable betterlockscreen@$USER.service
+```
+                      
 ## Compress initramfs with lz4
 
 Make sure `lz4` is installed.
