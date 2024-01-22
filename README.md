@@ -253,47 +253,47 @@ sudo systemctl start freecache.path
 Create a new service file, `arch-audit.service`, in `/etc/systemd/system/`.
 
 ```bash
-    `sudo nano /etc/systemd/system/arch-audit.service`
+    sudo vim /etc/systemd/system/arch-audit.service
 ```
 
 Add the following content to the file:
 
 ```bash
-    `[Unit] Description=Arch Audit Vulnerability Checking Service
-     [Service] Type=oneshot ExecStart=/usr/bin/arch-audit -u`
+    [Unit] Description=Arch Audit Vulnerability Checking Service
+    [Service] Type=oneshot ExecStart=/usr/bin/arch-audit -u
 ```
 
 Create the Timer File
 
 ```bash
-    `sudo nano /etc/systemd/system/arch-audit.timer`
+    sudo vim /etc/systemd/system/arch-audit.timer
 ```
 
 Add the following content to the timer file:
 
 ```bash
-    `[Unit] Description=Runs arch-audit daily
-     [Timer] OnCalendar=daily Persistent=true
-     [Install] WantedBy=timers.target`
+    [Unit] Description=Runs arch-audit daily
+    [Timer] OnCalendar=daily Persistent=true
+    [Install] WantedBy=timers.target
 ```
 
 Start the services
 
 ```bash
-    `sudo systemctl daemon-reload`
-    `sudo systemctl enable arch-audit.timer`
-    `sudo systemctl start arch-audit.timer`
+    sudo systemctl daemon-reload
+    sudo systemctl enable arch-audit.timer
+    sudo systemctl start arch-audit.timer
 
 *   You can check the status of the timer with:
 
 ```bash
-    `sudo systemctl status arch-audit.timer`
+    sudo systemctl status arch-audit.timer
 ```
 
 *   To see the next scheduled run:
 
 ```bash
-    `sudo systemctl list-timers arch-audit.timer`
+    sudo systemctl list-timers arch-audit.timer
 ```
 
 
@@ -533,75 +533,168 @@ Edit your NetworkManager configuration to point to the following IPs for respect
 ::1
 ```
 
-## MPV Custom .conf file (SVP4 NVIDIA VDPAU)
+# Mpv
 
-Install `nvidia-utils` (or similar package depending on your nvidia driver) and `libva-vdpau-driver`. Install SVP4.
 
-Create or edit `.config/mpv/mpv.conf`:
+- Install the smooth video project or [SVP4](https://www.svp-team.com/wiki/SVP:Linux)
+
+Ensure all i915 intel packages with:
+
+
+```bash
+yay --needed --noconfirm libva-intel-driver vulkan-intel libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa mesa libva libva-mesa-driver libva-vdpau-driver libva-utils lib32-libva lib32-libva-intel-driver lib32-libva-mesa-driver lib32-libva-vdpau-driver intel-ucode iucode-tool
+vulkan-intel lib32-vulkan-intel intel-gmmlib intel-graphics-compiler intel-compute-runtime intel-gpu-tools intel-media-driver intel-media-sdk intel-opencl-clang libmfx
+```
+
+Create a new profile for SVP and add it to the config file. This is my completed mpv.conf file and here is how to add the svp profile.
+
+- Edit  `~/.config/mpv/mpv.conf` to include the following: 
+
 
 ```
-vo=vdpau
-profile=opengl-hq
-hwdec=vdpau
-hwdec-codecs=all
-scale=ewa_lanczossharp
-cscale=ewa_lanczossharp
-interpolation
-tscale=oversample
-----------------
-SVP CUSTOM SETTINGS
-fs=yes
---screenshot-webp-lossless=yes
---override-display-fps=60
+```bash
+# --- // Constants:
 --loop-file=inf
-no-resume-playback
-geometry=50%:50%
-autofit-larger=90%x90%
-keep-open=yes
-force-window=immediate
+--speed=0.50
 osc=no
+#--loop-playlist=yes
 ontop=yes
-profile=gpu-hq
-video-sync=display-resample
-input-ipc-server=/tmp/mpvsocket
-hwdec=auto-copy
-hr-seek-framedrop=no
-vo=xv
-vo=vdpau=hqscaling=9
---no-correct-pts
-hwdec-codecs=all
-interpolation=yes
-scale=ewa_lanczossharp
-cscale=ewa_lanczossharp
-tscale=oversample
-gpu-context=wayland
-osc=no
-osd-bar=no
----------------
-PLAY IN MPV SETTINGS
-ontop=yes
-border=no
+#border=no
 window-scale=0.4
 geometry=100%:100%
---------------------
-demuxer-max-back-bytes=10000000000
-demuxer-max-bytes=10000000000
-interpolation=yes
-sub-visibility=no
-sub-auto=fuzzy
-alang=en,eng,da,dan
-slang=en,eng,da,dan
-vlang=en,eng,da,dan
-save-position-on-quit=yes
-ignore-path-in-watch-later-config=yes
+
+# --- // SVP_PROFILE:
+--profile-add= svp
+
+[svp]
+--input-ipc-server=/tmp/mpvsocket
+--hr-seek-framedrop=no
+--opengl-early-flush=yes
+--vf= format=fmt=yuv420p
+hwdec=auto-copy
+hwdec-codecs=all
+--no-resume-playback
+--ignore-path-in-watch-later-config=yes
+
+# --- // PLAYER_SETTINGS //
+#--loop-playlist=yes
+#setpts=PTS*2
+#--vd-lavc-dr=yes
+#--vd-lavc-assume-old-x264= yes
+#--user-agent=libmpv
+#--x11-bypass-compositor=no
+#--player-operation-mode= pseudo-gui
+--sub-visibility=no
+#--video-output-levels= full
+#--override-display-fps= 60
+#--rar-list-all-volumes= yes
+#--directory-mode= recursive
+#--corner-rounding= 1
+
+# --- // AUDIO_SETTINGS //
+#--video-sync=desync
+#--video-sync= display-resample
+#--audio-device=
+#--alsa/sysdefault:CARD= PCH
+#audio-pitch-correction=no
+#audio-channels=5.1
+#audio-channels=auto
+#volume-max=250
+#--no-audio
+
+# --- // WINDOW_MARGINS //
+#--window-scale= 0.500
+#geometry=50%:50%
+#--snap-window= yes
+#--spirv-compiler= shaderc
+--stop-screensaver= always
+#--osd-blur= 2
+#--osd-border-size= 1
+#--osd-duration= 8000
+#--osd-on-seek= msg-bar
+#--force-window= immediate
+#--force-seekable= yes
+#--display-tags= Title, Channerl_URL, service_name
+#--fs= no
+#--autofit-smaller= yes
+#--geometry=50%+10+10/2
+#--geometry=100%:100%
+#--keep-open=always
+#--keep-open-pause=no
+#--taskbar-progress=yes
+#--term-title= yes
+--title= ${?media-title:${media-title}}- mpv
+#--no-border
+#--osd-level=1
+#--osd-bar=no
+#save-position-on-quit=yes
+#--video-rotate=<0-359|no>
+#keepaspect=no
+#--ontop= yes
+#--on-all-workspaces= yes
+
+# --- // PROFILES //
+#[vdpau]
+#--hqscaling=9
+#--scale=ewa_lanczossharp
+#--scale=bilinear
+#--cscale=bilinear
+#--cscale=spline36
+#--zimg-dither= error-diffusion
+#--zimg-scaler= spline36
+#--zimg-scaler-chroma= spline36
+#--no-correct-pts
+#--deband= yes
+#--deinterlace= yes
+#--interpolation= yes
+#--interpolation-preserve= yes
+#--linear-upscaling= yes
+#--interpolation-threshold= 0.03
+#--tscale-param1= mitchell
+#--tscale-param2= 0.5
+#--sws-scaler= lanczos
+#--sws-fast=no
+#--sws-allow-zimg=yes
+#--zimg-fast=no
+#--tone-mapping-max-boost=2.0
+#sharpen=5
+#--gpu-dumb-mode=yes
+#--gpu-context=wayland
+#vo=gpu
+#vo=gl
+#vo=vdpau
+
+#[Act as a web browser]
+# Pretend to be a web browser. Might fix playback with some streaming sites,
+# but also will break with shoutcast streams.
+#user-agent="Mozilla/5.0"
+#cache=yes
+#demuxer-max-bytes=123400KiB
+#cache-pause=no
+#demuxer-readahead-secs=20
+
+# --- // Screenshots:
+--screenshot-format=png
+--screenshot-png-compression=0
+--screenshot-directory="~/Pictures/Screens"
+--screenshot-template="%F - [%P]v%#01n"
+#--screenshot-webp-lossless=yes
+#--screenshot-webp-quality=100
+
+# --- // Extension_behavior:
+image-display-duration=inf
+
 [extension.gif]
 loop-file=inf
+
 [extension.webm]
 loop-file=inf
+
 [extension.jpg]
-pause
+--pause=yes
+
 [extension.png]
-pause
+--pause=yes
 ```
 
 
