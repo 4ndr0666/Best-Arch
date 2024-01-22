@@ -736,5 +736,5 @@ QT_QPA_PLATFORMTHEME=qt5ct
 - Add the following to `~/.profile`:
 
 ```
-[ "$XDG_CURRENT_DESKTOP" = "KDE" ] || export QT_QPA_PLATFORMTHEME="qt5ct"
+[ "$XDG_CURRENT_DESKTOP" = "Openbox" ] || export QT_QPA_PLATFORMTHEME="qt5ct"
 ```
