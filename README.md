@@ -1,12 +1,26 @@
-# Best-Arch
-My arch config
+File: README.md
+Author: 4ndr0666
+Edited: 5-25-24
 
-## Enable weekly fstrim
+# --- // BEST_ARCH // ========
+
+
+## --- // SSDs_ENABLE_WEEKLY_FILESYSTEM_TRIM:
 
 ```bash
-sudo systemctl enable fstrim.timer
+sudo systemctl enable fstrim.timer --now
 ```
-## Enable parallel compilation and compression
+## --- // MAKE_TIMEOUTS&REBOOTS_FASTER:
+
+Edit `/etc/systemd/system.conf`:
+
+```bash
+RebootWatchdogSec=10s
+DefaultTimeoutStartSec=5s
+DefaultTimeoutStopSec=5s
+```
+
+## --- // MAKEPKG_PARRALELL_COMPILATION&COMPRESSION:
 
 Edit `/etc/makepkg.conf`:
 
@@ -14,15 +28,15 @@ Edit `/etc/makepkg.conf`:
 - Edit the row saying `COMPRESSXZ=(xz -c -z -)` to `COMPRESSXZ=(xz -c -z - --threads=0)`
 - `sudo pacman -S pigz` and edit the row saying `COMPRESSGZ=(gzip -c -f -n)` to `COMPRESSGZ=(pigz -c -f -n)`
 
-## Intel GPU
+## --- // GPU:
 
-### Intel GPU early kernel mode setting
+### --- // Intel GPU early kernel mode setting:
 
 Edit `/etc/mkinitcpio.conf`, add the following at the end of the `MODULES` array: `intel_agp i915`
 
 **NOTE**: on some systems (Intel+AMD GPU) adding `intel_agp` can cause issues with resume from hibernation. [Reference](https://wiki.archlinux.org/title/Kernel_mode_setting#Early_KMS_start).
 
-### Fix screen tearing
+### --- // Fix screen tearing:
 
 Edit `/etc/X11/xorg.conf.d/`, add the following conf file: `20-intel.conf`
 
@@ -37,12 +51,17 @@ EndSection
 sudo mkinitcpio -p linux
 ```
 
-### Enable betterscreen suspend service
+### --- // Enable betterscreen suspend service:
 
 ```bash
 sudo systemctl enable betterlockscreen@$USER.service
 ```
-                      
+
+### --- // AMD hwdec:
+```bash
+sudo pacman -S libva-mesa-driver mesa-vdpau
+```
+
 ## Compress initramfs with lz4
 
 Make sure `lz4` is installed.
@@ -548,7 +567,7 @@ vulkan-intel lib32-vulkan-intel intel-gmmlib intel-graphics-compiler intel-compu
 
 Create a new profile for SVP and add it to the config file. This is my completed mpv.conf file and here is how to add the svp profile.
 
-- Edit  `~/.config/mpv/mpv.conf` to include the following: 
+- Edit  `~/.config/mpv/mpv.conf` to include the following:
 
 
 ```
@@ -737,4 +756,38 @@ QT_QPA_PLATFORMTHEME=qt5ct
 
 ```
 [ "$XDG_CURRENT_DESKTOP" = "Openbox" ] || export QT_QPA_PLATFORMTHEME="qt5ct"
+```
+
+## --- // FONTS:
+
+Edit `~/.Xresources`
+```bash
+Xft.dpi: 110
+Xft.autohint: 0
+Xft.lcdfilter:  lcdlegacy
+Xft.hintstyle:  hintfull
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb
+
+! Style: nightfox
+! Upstream: https://github.com/edeneast/nightfox.nvim/raw/main/extra/nightfox/nightfox.Xresources
+*background: #192330
+*foreground: #cdcecf
+*color0:  #393b44
+*color1:  #c94f6d
+*color2:  #81b29a
+*color3:  #dbc074
+*color4:  #719cd6
+*color5:  #9d79d6
+*color6:  #63cdcf
+*color7:  #dfdfe0
+*color8:  #575860
+*color9:  #d16983
+*color10: #8ebaa4
+*color11: #e0c989
+*color12: #86abdc
+*color13: #baa1e2
+*color14: #7ad5d6
+*color15: #e4e4e5
 ```
