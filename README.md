@@ -32,7 +32,19 @@ Edit `/etc/makepkg.conf`:
 
 ### --- // Intel GPU early kernel mode setting:
 
-Edit `/etc/mkinitcpio.conf`, add the following at the end of the `MODULES` array: `intel_agp i915`
+Ensure the modules `intel_agp i915` are first in the `MODULES` array in `/etc/mkinitcpio.conf`.
+
+Ensure `/etc/modprobe.d/i915.conf` exists. If not, create it with these values:
+
+```bash
+options i915 enable_guc=2
+options i915 enable_fbc=1
+```
+
+```bash
+sudo mkinitcpio -P
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+```
 
 **NOTE**: on some systems (Intel+AMD GPU) adding `intel_agp` can cause issues with resume from hibernation. [Reference](https://wiki.archlinux.org/title/Kernel_mode_setting#Early_KMS_start).
 
