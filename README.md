@@ -290,8 +290,12 @@ Create a new service file, `arch-audit.service`, in `/etc/systemd/system/`.
 Add the following content to the file:
 
 ```bash
-    [Unit] Description=Arch Audit Vulnerability Checking Service
-    [Service] Type=oneshot ExecStart=/usr/bin/arch-audit -u
+    [Unit] 
+    Description=Arch Audit Vulnerability Checking Service
+
+    [Service] 
+    Type=oneshot 
+    ExecStart=/usr/bin/arch-audit -u
 ```
 
 Create the Timer File
@@ -303,8 +307,13 @@ Create the Timer File
 Add the following content to the timer file:
 
 ```bash
-    [Unit] Description=Runs arch-audit daily
-    [Timer] OnCalendar=daily Persistent=true
+    [Unit] 
+    Description=Runs arch-audit daily
+
+    [Timer] 
+    OnCalendar=daily 
+    Persistent=true
+
     [Install] WantedBy=timers.target
 ```
 

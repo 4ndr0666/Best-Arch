@@ -9,30 +9,25 @@
 # --- // KILL_IF_NONINTERACTIVE:
 [[ $- != *i* ]] && return
 
+# --- // PROMPT:
 PS1='[\u@\h \W]\$💀 '
 
 # --- // PATH:
+if [ -d "$HOME/.bin" ] ;
+  then PATH="$HOME/.bin:$PATH"
+fi
+
 if [ -d "$HOME/.local/bin" ] ;
   then PATH="$HOME/.local/bin:$PATH"
 fi
 
-if [ -d "/usr/local/bin" ] ;
-then PATH="$PATH:$(find /usr/local/bin -type d | paste -sd ':' -)$PATH"
-fi
-
-export PATH="${HOME}/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:"
-export PATH="${PATH}/usr/local/sbin:/opt/bin:/usr/bin/core_perl:/usr/games/bin:"
-
+# --- // DOCUMENT_SOURCING:
+#[[ -f "~/.config/shell/aliasrc" ]] || source "~/.config/shell/aliasrc"
+#[[ -f "~/.config/shell/functions/functionsrc" ]] || source "~/.config/shell/functions/functionsrc" 
 # --- // ENV:
 HISTCONTROL=ignoreboth
 HISTTIMEFORMAT="%Y-%m-%d %T "
-shopt -s cdspell
-complete -cf sudo
-shopt -s autocd
-shopt -s checkwinsize
-run-help() { help "$READLINE_LINE" 2>/dev/null || man "$READLINE_LINE"; }
-bind -m vi-insert -x '"\eh": run-help'
-bind -m emacs -x     '"\eh": run-help'
+bind "set completion-ignore-case on"
 [[ -f /home/andro/.config/shell/functions/functionsrc ]] || source "/home/andro/.config/shell/functions/functionsrc" 2>/dev/null/
 alias 00='cat $USER/.bashrc'
 alias 0f='cat $USER/.zshrc'
@@ -108,12 +103,16 @@ alias l.='exa -ald --color=always --group-directories-first --icons .*' # show o
 # --- // TYPOS:
 alias cd..='cd ..'
 alias pdw='pwd'
+alias udpate='sudo pacman -Syyu'
+alias upate='sudo pacman -Syyu'
+alias updte='sudo pacman -Syyu'
+alias updqte='sudo pacman -Syyu'
 alias sl='ls'
 alias gerp='grep'
 alias shudown='shutdown'
 alias pdw='pwd'
 
-# --- // FORCE_NEOVIM & PARU:
+# --- // FORCE_NEOVIM:
 if command -v nvim > /dev/null 2>&1; then
     alias vim="nvim"
     alias vimdiff="nvim -d"
@@ -122,7 +121,6 @@ else
     command -v vim > /dev/null 2>&1 || { echo "vim also not found. Please install a text editor."; return 1; }
 fi
 alias svim="sudo nvim"
-alias yay="paru"
 alias vim="nvim"
 
 # --- // EDIT_CONFIG_FILES:
@@ -207,7 +205,6 @@ alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
 alias s='sudo'
-alias p='pacman'
 alias cp='cp -iv'
 alias mv='mv -iv'
 alias rm='rm -vI'
@@ -217,7 +214,7 @@ alias rmdir='rm -vI --preserve root'
 alias ln='ln -iv'
 alias bc='bc -ql'
 alias mkdir='mkdir -pv'
-alias wget="wget -c"
+alias wget="wget --hsts-file='$XDG_DATA_HOME/wget-hsts'"
 alias curl="curl --user-agent 'noleak'"
 alias df='df -h --exclude-type=squashfs --exclude-type=tmpfs --exclude-type=devtmpfs'
 alias cat='bat --number --style snip --style changes --style header'
@@ -226,13 +223,13 @@ alias grub-mkconfig='sudo grub-mkconfig -o /boot/grub/grub.cfg'
 alias chown='chown --preserve-root'
 alias chmod='chmod --preserve-root'
 alias chgrp='chgrp --preserve-root'
-alias grepc='grep --color=auto'
+alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 #alias ccat='highlight --out-format=ansi'
 alias ip='ip -color=auto'
 alias c='clear; echo; echo; seq 1 $(tput cols) | sort -R | spark | lolcat; echo; echo'
-alias hw='sudo hwinfo --short'
+alias hw='hwinfo --short'
 alias psa='ps auxf | less'
 alias free='free -mt'
 alias jctl='journalctl -p 3 -xb'
@@ -242,7 +239,14 @@ alias grh="git reset --hard"
 alias gfs="git-lfs"
 alias microcode='grep . /sys/devices/system/cpu/vulnerabilities/*'
 alias cpu="cpuid -i | grep uarch | head -n 1"
+# ======================================================== // UNIQUE_ALIASES //
+alias kernel="ls /usr/lib/modules"
+alias kernels="ls /usr/lib/modules"
+alias bls="betterlockscreen -u /usr/share/backgrounds/"
 alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
+alias burnit='echo "sudo dd bs=4M if=path/to/.iso of=/dev/sdX status=progress oflag=sync"'
+alias list="xclip -o | tr '\n' ' ' | sed 's/ $/\n/' | xclip -selection c"
+alias splitlist="xclip -o | tr ',' '\n'"
 alias dir5='du -cksh * | sort -hr | head -5'
 alias dir10='du -cksh * | sort -hr | head -10'
 alias dir='dir --color=auto'
@@ -251,7 +255,6 @@ alias reload="source ~/.bashrc"
 alias magic='sudo /usr/local/bin/magic.sh'
 
 
-# ======================================================== // UNIQUE_ALIASES //
 alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
 alias riplong="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -3000 | nl"
 alias gitpkg="pacman -Q | grep -i '\-git' | wc -l"
@@ -274,11 +277,9 @@ alias untar='tar -xvf '
 alias watch='watch '
 alias lock='sudo chattr +i '
 alias unlock='sudo chattr -i '
-alias kernel="ls /usr/lib/modules"
-alias kernels="ls /usr/lib/modules"
-alias burnit='echo "sudo dd bs=4M if=path/to/.iso of=/dev/sdX status=progress oflag=sync"'
-
 # Count or list files in the current directory
+#alias lsfiles='find $PWD -type f | wc -l'
+#alias lsmount='mount |column -t'# Count or list files in the current directory
 lsfiles() {
     if [[ "$1" == "-l" ]]; then
         echo "Files in $PWD:"
@@ -360,11 +361,17 @@ alias ssr="echo 'Rebooting...' | sudo tee -a /var/log/user_commands.log && sudo 
 alias fixdirmngr='sudo dirmngr </dev/null'
 
 # ======================================================= // BASIC_FUNCTIONS //
+# --- // Sudo:
+sudo_func() {
+    sudo -v
+    sudo "$@"
+}
 gclone() {
     git clone --depth 1 "$@" && \
       cd -- "$(basename "$1" .git)" || exit
 }
 
+# --- // Git_add_all/commit_all/comment/pull/push:
 gcomp() {
     git add .
     git commit -m "$*"
@@ -378,6 +385,40 @@ gcom() {
     git commit -m "$1" -a
 }
 
+# --- // Change_shell:
+if alias tobash &>/dev/null; then
+    unalias tobash
+fi
+
+if alias tozsh &>/dev/null; then
+    unalias tozsh
+fi
+
+if alias tofish &>/dev/null; then
+    unalias tofish
+fi
+
+tobash() {
+    sudo $chsh -s "$(which bash)" && echo 'Now log out.'
+}
+
+tozsh() {
+    sudo $chsh -s "$(which zsh)" && echo 'Now log out.'
+}
+
+tofish() {
+    sudo $chsh -s "$(which fish)" && echo 'Now log out.'
+}
+
+
+
+# ========================================================// UNIQUE_FUNTIONS //
+# --- // List_dependent_pkgs_of_application:
+whatdependson()  {
+    search=$(echo "$1")
+    sudo pacman -Sii $search | grep "Required" | sed -e "s/Required By     : //g" | sed -e "s/  /\n/g"
+    }
+
 # --- // Make_an_archived_backup:
 # --- // Quick_archive_backup:
 f() {
@@ -389,3 +430,42 @@ f() {
     tar -czvf "${target##*/}_$(date -u "+%h-%d-%Y_%H.%M%p")_backup.tar.gz" "$target"
 }
 
+# --- // Move_up_1_directory:
+up() { for _ in $(seq "${1:-1}"); do cd ..; done; }
+
+# --- // All_port80_connections:
+function con80() {
+  {
+    LANG= ss -nat || LANG= netstat -nat
+  } | grep -E ":80[^0-9]" | wc -l
+}
+
+# --- // Extract_Archives:
+extract ()
+{
+  if [ -f $1 ] ; then
+    case $1 in
+      *.tar.bz2)   tar xjf $1   ;;
+      *.tar.gz)    tar xzf $1   ;;
+      *.bz2)       bunzip2 $1   ;;
+      *.rar)       unrar x $1   ;;
+      *.gz)        gunzip $1    ;;
+      *.tar)       tar xf $1    ;;
+      *.tbz2)      tar xjf $1   ;;
+      *.tgz)       tar xzf $1   ;;
+      *.zip)       unzip $1     ;;
+      *.Z)         uncompress $1;;
+      *.7z)        7z x $1      ;;
+      *.deb)       ar x $1      ;;
+      *.tar.xz)    tar xf $1    ;;
+      *.tar.zst)   tar xf $1    ;;
+      *)           echo "'$1' cannot be extracted via ex()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+
+#create a file called .bashrc-personal and put all your personal aliases
+#in there. They will not be overwritten by skel.
+#[[ -f ~/.bashrc-personal ]] && . ~/.bashrc-personal
