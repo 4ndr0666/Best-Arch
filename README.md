@@ -1,8 +1,3 @@
-File: README.md
-File: README.md
-Author: 4ndr0666
-Edited: 5-25-24
-
 # --- // BEST_ARCH // ========
 
 ## SSDs: Enable Weekly Filesystem Trim
@@ -32,12 +27,12 @@ DefaultTimeoutStopSec=5s
 
 ## Enable Parallel Compilation & Compression with Makepkg
 
-To optimize the package building process, you can enable parallel compilation and compression by editing the \`/etc/makepkg.conf\` file:
+To optimize the package building process, you can enable parallel compilation and compression by editing the `/etc/makepkg.conf` file:
 
 1. **Parallel Compilation**: 
     - Add the following line to utilize all but one CPU thread:
     ```bash
-    MAKEFLAGS="-j\$(nproc)"
+    MAKEFLAGS="-j$(nproc)"
     ```
     - Replace `$(nproc)` with your CPU's thread count minus one (e.g., `-j7` for an 8-thread CPU).
 
@@ -53,7 +48,7 @@ To optimize the package building process, you can enable parallel compilation an
     ```
 
 ### Explanation:
-- **Parallel Compilation**: `MAKEFLAGS="-j\$(nproc)"` tells `makepkg` to use multiple CPU cores during the build process, speeding up compilation.
+- **Parallel Compilation**: `MAKEFLAGS="-j$(nproc)"` tells `makepkg` to use multiple CPU cores during the build process, speeding up compilation.
 - **Compression Settings**: Replacing `gzip` with `pigz` allows for parallel compression, which is significantly faster on multi-core processors.
 
 After editing the file, the changes will take effect the next time you build a package using `makepkg`.
@@ -113,7 +108,7 @@ Make sure `lz4` is installed.
 
 Edit `/etc/mkinitcpio.conf`:
 
-- Add `lz4 lz4_compress\ to the `MODULES` list (delimited by `()`)
+- Add `lz4 lz4_compress` to the `MODULES` list (delimited by `()`)
 - Uncomment or add the line saying `COMPRESSION="lz4"`
 - Add a line saying `COMPRESSION_OPTIONS="-9"`
 - Add `shutdown` to the `HOOKS` list (delimited by `()`)
@@ -248,7 +243,7 @@ Create the monitoring script that will continuously check the system's free memo
 ```bash
 #!/bin/bash
 while true; do
-    FREE_RAM=$(free -m | awk '/^Mem:/{print \$4}')
+    FREE_RAM=$(free -m | awk '/^Mem:/{print $4}')
     # Adjust this threshold as needed, ensuring it's higher than oomd's threshold
     if [ "$FREE_RAM" -lt 1000 ]; then
         touch /tmp/low_memory
@@ -387,7 +382,7 @@ Edit `/etc/mkinitcpio.conf`:
   - For NVIDIA GPUs: `nvidia` *(note: this is untested)*
   - For KVM/qemu VMs: `qxl`
 
-Edit `/boot/loader/entries/arch-linux.conf`: add these arguments in the kernel options (append to the \`options\` section): \`quiet splash loglevel=3 rd.udev.log_priority=3 vt.global_cursor_default=1\`
+Edit `/boot/loader/entries/arch-linux.conf`: add these arguments in the kernel options (append to the `options` section): `quiet splash loglevel=3 rd.udev.log_priority=3 vt.global_cursor_default=1`
 
 ```bash
 sudo systemctl disable gdm
@@ -683,7 +678,7 @@ hwdec-codecs=all
 #--keep-open-pause=no
 #--taskbar-progress=yes
 #--term-title= yes
---title= \${?media-title:\${media-title}}- mpv
+--title= ${?media-title:${media-title}}- mpv
 #--no-border
 #--osd-level=1
 #--osd-bar=no
@@ -801,7 +796,7 @@ QT_QPA_PLATFORMTHEME=qt5ct
 ## --- // FONTS:
 
 Edit `~/.Xresources`
-\\\\\`\\\\\`\\\\\`bash
+```bash
 Xft.dpi: 110
 Xft.autohint: 0
 Xft.lcdfilter:  lcdlegacy
