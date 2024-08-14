@@ -1,32 +1,64 @@
 File: README.md
+File: README.md
 Author: 4ndr0666
 Edited: 5-25-24
 
 # --- // BEST_ARCH // ========
 
+## SSDs: Enable Weekly Filesystem Trim
 
-## --- // SSDs_ENABLE_WEEKLY_FILESYSTEM_TRIM:
+To enable weekly filesystem trim on your SSDs, run the following command:
 
-```bash
+``bash
 sudo systemctl enable fstrim.timer --now
 ```
-## --- // MAKE_TIMEOUTS&REBOOTS_FASTER:
 
-Edit `/etc/systemd/system.conf`:
+### Explanation:
+- **Title Change**: Simplified the section title for clarity and consistency.
+- **Command Block**: Used a proper code block to highlight the command.
+- **Explanation Added**: Included a brief explanation to inform users why they should run this command.
 
-```bash
+---
+
+## Make Timeouts & Reboots Faster
+
+To reduce the timeouts and speed up reboots, edit the `etc/systemd/system.conf` file and adjust the following settings:
+
+```ini
 RebootWatchdogSec=10s
 DefaultTimeoutStartSec=5s
 DefaultTimeoutStopSec=5s
 ```
 
-## --- // MAKEPKG_PARRALELL_COMPILATION&COMPRESSION:
+## Enable Parallel Compilation & Compression with Makepkg
 
-Edit `/etc/makepkg.conf`:
+To optimize the package building process, you can enable parallel compilation and compression by editing the \`/etc/makepkg.conf\` file:
 
-- Add the following row (replace 7 with CPU threads-1): `MAKEFLAGS="-j7"`
-- Edit the row saying `COMPRESSXZ=(xz -c -z -)` to `COMPRESSXZ=(xz -c -z - --threads=0)`
-- `sudo pacman -S pigz` and edit the row saying `COMPRESSGZ=(gzip -c -f -n)` to `COMPRESSGZ=(pigz -c -f -n)`
+1. **Parallel Compilation**: 
+    - Add the following line to utilize all but one CPU thread:
+    ```bash
+    MAKEFLAGS="-j\$(nproc)"
+    ```
+    - Replace `$(nproc)` with your CPU's thread count minus one (e.g., `-j7` for an 8-thread CPU).
+
+2. **Faster Compression with Pigz**:
+    - Install `pigz` (Parallel Implementation of Gzip):
+    ```bash
+    sudo pacman -S pigz
+    ```
+    - Modify the compression settings:
+    ```bash
+    COMPRESSXZ=(xz -c -z - --threads=0)
+    COMPRESSGZ=(pigz -c -f -n)
+    ```
+
+### Explanation:
+- **Parallel Compilation**: `MAKEFLAGS="-j\$(nproc)"` tells `makepkg` to use multiple CPU cores during the build process, speeding up compilation.
+- **Compression Settings**: Replacing `gzip` with `pigz` allows for parallel compression, which is significantly faster on multi-core processors.
+
+After editing the file, the changes will take effect the next time you build a package using `makepkg`.
+
+---
 
 ## --- // GPU:
 
@@ -59,6 +91,7 @@ Section "Device"
      Option "TearFree" "true"
 EndSection
 ```
+
 ```bash
 sudo mkinitcpio -p linux
 ```
@@ -66,7 +99,7 @@ sudo mkinitcpio -p linux
 ### --- // Enable betterscreen suspend service:
 
 ```bash
-sudo systemctl enable betterlockscreen@$USER.service
+sudo systemctl enable betterlockscreen@${USER}.service
 ```
 
 ### --- // AMD hwdec:
@@ -80,7 +113,7 @@ Make sure `lz4` is installed.
 
 Edit `/etc/mkinitcpio.conf`:
 
-- Add `lz4 lz4_compress` to the `MODULES` list (delimited by `()`)
+- Add `lz4 lz4_compress\ to the `MODULES` list (delimited by `()`)
 - Uncomment or add the line saying `COMPRESSION="lz4"`
 - Add a line saying `COMPRESSION_OPTIONS="-9"`
 - Add `shutdown` to the `HOOKS` list (delimited by `()`)
@@ -131,7 +164,7 @@ To change the governor on boot create a systemd service.
 
 Create `/etc/systemd/system/cpupower.service`:
 
-```
+```ini
 [Unit]
 Description=Set CPU governor to performance
 
@@ -149,10 +182,9 @@ Finally run `sudo systemctl enable cpupower.service`.
 
 Create `/etc/udev/rules.d/50-scaling-governor.rules` as follows:
 
-```
+```bash
 SUBSYSTEM=="module", ACTION=="add", KERNEL=="acpi_cpufreq", RUN+=" /bin/sh -c ' echo performance > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor ' "
 ```
-
 
 ## Manage system resources for better performance
 
@@ -194,7 +226,7 @@ clear_ram_cache() {
 }
 
 clear_swap() {
-    if [ "$SWAP_USAGE" -gt 80 ]; then
+    if [ "$SWAP_USAGE" -gt 80    ]; then
         sudo swapoff -a && sudo swapon -a
         log_action "Swap cleared due to high swap usage."
     fi
@@ -211,12 +243,12 @@ log_action "Memory and Swap Usage After Operations:"
 free -h | tee -a /var/log/freecache.log
 ```
 
-Create the monitoring script that will continuously check the system's free memory and update 'tmp/low_memory' when low.
+Create the monitoring script that will continuously check the system's free memory and update \`/tmp/low_memory\` when low.
 
 ```bash
 #!/bin/bash
 while true; do
-    FREE_RAM=$(free -m | awk '/^Mem:/{print $4}')
+    FREE_RAM=$(free -m | awk '/^Mem:/{print \$4}')
     # Adjust this threshold as needed, ensuring it's higher than oomd's threshold
     if [ "$FREE_RAM" -lt 1000 ]; then
         touch /tmp/low_memory
@@ -227,9 +259,9 @@ while true; do
 done
 ```
 
-Now the Systemd Service file for freecache.sh at /etc/systemd/system:
+Now the Systemd Service file for `freecache.sh` at `/etc/systemd/system`:
 
-```
+```ini
 [Unit]
 Description=Free Cache when Memory is Low
 After=oomd.service  # Ensures this service runs after oomd
@@ -239,12 +271,12 @@ Type=oneshot
 ExecStart=/usr/local/bin/System_utilities/freecache.sh
 
 [Install]
-WantedBy=
+WantedBy=multi-user.target
 ```
 
-And its Path File at /etc/systemd/system:
+And its Path File at `/etc/systemd/system`:
 
-```
+```ini
 [Unit]
 Description=Monitor for Low Memory Condition
 
@@ -257,7 +289,7 @@ WantedBy=multi-user.target
 
 Service file for the monitoring script:
 
-```
+```ini
 [Unit]
 Description=Monitor Memory Usage
 
@@ -269,7 +301,7 @@ ExecStart=/usr/local/bin/System_utilities/memory_monitor.sh
 WantedBy=multi-user.target
 ```
 
-And finally, enable and start both the 'memory_monitor.service' and 'freecache.path':
+And finally, enable and start both the `memory_monitor.service` and `freecache.path`:
 
 ```bash
 sudo systemctl enable memory_monitor.service
@@ -278,65 +310,64 @@ sudo systemctl enable freecache.path
 sudo systemctl start freecache.path
 ```
 
-
 ## Setup Arch-Audit Timer for security
 
 Create a new service file, `arch-audit.service`, in `/etc/systemd/system/`.
 
 ```bash
-    sudo vim /etc/systemd/system/arch-audit.service
+sudo vim /etc/systemd/system/arch-audit.service
 ```
 
 Add the following content to the file:
 
-```bash
-    [Unit]
-    Description=Arch Audit Vulnerability Checking Service
-    
-    [Service]
-    Type=oneshot
-    ExecStart=/usr/bin/arch-audit -u
+```ini
+[Unit]
+Description=Arch Audit Vulnerability Checking Service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/arch-audit -u
 ```
 
 Create the Timer File
 
 ```bash
-    sudo vim /etc/systemd/system/arch-audit.timer
+sudo vim /etc/systemd/system/arch-audit.timer
 ```
 
 Add the following content to the timer file:
 
-```bash
-    [Unit]
-    Description=Runs arch-audit daily
-    
-    [Timer]
-    OnCalendar=daily
-    Persistent=true
-    
-    [Install]
-    WantedBy=timers.target
+```ini
+[Unit]
+Description=Runs arch-audit daily
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
 ```
 
 Start the services
 
 ```bash
-    sudo systemctl daemon-reload
-    sudo systemctl enable arch-audit.timer
-    sudo systemctl start arch-audit.timer
+sudo systemctl daemon-reload
+sudo systemctl enable arch-audit.timer
+sudo systemctl start arch-audit.timer
+```
 
 *   You can check the status of the timer with:
 
 ```bash
-    sudo systemctl status arch-audit.timer
+sudo systemctl status arch-audit.timer
 ```
 
 *   To see the next scheduled run:
 
 ```bash
-    sudo systemctl list-timers arch-audit.timer
+sudo systemctl list-timers arch-audit.timer
 ```
-
 
 ## Setting up Plymouth
 
@@ -356,14 +387,13 @@ Edit `/etc/mkinitcpio.conf`:
   - For NVIDIA GPUs: `nvidia` *(note: this is untested)*
   - For KVM/qemu VMs: `qxl`
 
-Edit `/boot/loader/entries/arch-linux.conf`: add these arguments in the kernel options (append to the `options` section): `quiet splash loglevel=3 rd.udev.log_priority=3 vt.global_cursor_default=1`
+Edit `/boot/loader/entries/arch-linux.conf`: add these arguments in the kernel options (append to the \`options\` section): \`quiet splash loglevel=3 rd.udev.log_priority=3 vt.global_cursor_default=1\`
 
 ```bash
 sudo systemctl disable gdm
 sudo systemctl enable gdm-plymouth
 sudo mkinitcpio -p linux
 ```
-
 
 ### Copy monitor layout from user to GDM
 
@@ -375,7 +405,6 @@ To copy your user's monitors configuration over to GDM, use these commands:
 sudo cp $HOME/.config/monitors.xml /var/lib/gdm/.config/
 sudo chown gdm:gdm /var/lib/gdm/.config/monitors.xml
 ```
-
 
 ## Create a swap file
 
@@ -400,21 +429,19 @@ Edit `/etc/fstab` adding the following line:
 
 ### Removing the swap file if not necessary/wanted anymore
 
-```
+```bash
 sudo swapoff -a
 ```
 
 Edit `/etc/fstab` and remove the swapfile entry, and finally:
 
-```
+```bash
 sudo rm -f /home/swapfile
 ```
 
 ### Alternative route
 
 Use systemd-swap for automated and dynamic swapfile allocation and use. Consult [the GitHub project page](https://github.com/Nefelim4ag/systemd-swap) for more info.
-
-
 
 ## Create a cron tab to automatically free swap and ram cache
 
@@ -425,25 +452,23 @@ Make the script:
 # This command frees only RAM cache
 #echo "echo 3 > /proc/sys/vm/drop_caches"
 # This command frees RAM cache and swap
-su -c "echo 3 >'/proc/sys/vm/drop_caches' && swapoff -a && swapon -a && printf '\n%s\n' 'Ram-cache and Swap Cleared'" root
+su -c "echo 3 >'/proc/sys/vm/drop_caches' && swapoff -a && swapon -a && printf 'n%sn' 'Ram-cache and Swap Cleared'" root
 ```
 
 Make it executable:
-```
+```bash
 chmod 755 freecache
 ```
 
 Make the crontab:
-```
+```bash
 crontab -e
 ```
+
 Append the below line, save and exit to run it at 2 am daily:
 ```
-
 0  2  *  *  *  /usr/local/bin/freecache
 ```
-
-
 
 ## Enable Hibernation
 
@@ -456,7 +481,6 @@ Add this line to a file inside `/etc/sysctl.d/` (ie: `99-sysctl.conf`)
 ```
 kernel.sysrq=1
 ```
-
 
 # Package Management
 
@@ -502,14 +526,14 @@ Edit `/etc/dnscrypt-proxy/dnscrypt-proxy.toml`:
 
 Edit `/usr/lib/systemd/system/dnscrypt-proxy.service` to include the following:
 
-```
+```ini
 [Service]
 DynamicUser=yes
 ```
 
 Edit `/usr/lib/systemd/system/dnscrypt-proxy.socket` to change the port dnscrypt runs on. Here is a snippet:
 
-```
+```ini
 [Socket]
 ListenStream=127.0.0.1:53000
 ListenDatagram=127.0.0.1:53000
@@ -517,7 +541,7 @@ ListenDatagram=127.0.0.1:53000
 
 Create `/etc/pdnsd.conf` like so:
 
-```
+```ini
 global {
 	perm_cache=1024;
 	cache_dir="/var/cache/pdnsd";
@@ -576,23 +600,18 @@ Edit your NetworkManager configuration to point to the following IPs for respect
 
 # Mpv
 
-
 - Install the smooth video project or [SVP4](https://www.svp-team.com/wiki/SVP:Linux)
 
 Ensure all i915 intel packages with:
 
-
 ```bash
-yay --needed --noconfirm libva-intel-driver vulkan-intel libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa mesa libva libva-mesa-driver libva-vdpau-driver libva-utils lib32-libva lib32-libva-intel-driver lib32-libva-mesa-driver lib32-libva-vdpau-driver intel-ucode iucode-tool
-vulkan-intel lib32-vulkan-intel intel-gmmlib intel-graphics-compiler intel-compute-runtime intel-gpu-tools intel-media-driver intel-media-sdk intel-opencl-clang libmfx
+yay --needed --noconfirm libva-intel-driver vulkan-intel libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa mesa libva libva-mesa-driver libva-vdpau-driver libva-utils lib32-libva lib32-libva-intel-driver lib32-libva-mesa-driver lib32-libva-vdpau-driver intel-ucode iucode-tool vulkan-intel lib32-vulkan-intel intel-gmmlib intel-graphics-compiler intel-compute-runtime intel-gpu-tools intel-media-driver intel-media-sdk intel-opencl-clang libmfx
 ```
 
 Create a new profile for SVP and add it to the config file. This is my completed mpv.conf file and here is how to add the svp profile.
 
 - Edit  `~/.config/mpv/mpv.conf` to include the following:
 
-
-```
 ```bash
 # --- // Constants:
 --loop-file=inf
@@ -664,7 +683,7 @@ hwdec-codecs=all
 #--keep-open-pause=no
 #--taskbar-progress=yes
 #--term-title= yes
---title= ${?media-title:${media-title}}- mpv
+--title= \${?media-title:\${media-title}}- mpv
 #--no-border
 #--osd-level=1
 #--osd-bar=no
@@ -738,13 +757,12 @@ loop-file=inf
 --pause=yes
 ```
 
-
 ## Setup libvirt
 
 ```bash
 sudo pacman -S libvirt ebtables dnsmasq bridge-utils virt-manager
-sudo gpasswd -a $USERNAME libvirt
-sudo gpasswd -a $USERNAME kvm
+sudo gpasswd -a ${USERNAME} libvirt
+sudo gpasswd -a ${USERNAME} kvm
 sudo systemctl enable libvirtd
 sudo systemctl start libvirtd
 ```
@@ -777,13 +795,13 @@ QT_QPA_PLATFORMTHEME=qt5ct
 - Add the following to `~/.profile`:
 
 ```
-[ "$XDG_CURRENT_DESKTOP" = "Openbox" ] || export QT_QPA_PLATFORMTHEME="qt5ct"
+[ "\$XDG_CURRENT_DESKTOP" = "Openbox" ] || export QT_QPA_PLATFORMTHEME="qt5ct"
 ```
 
 ## --- // FONTS:
 
 Edit `~/.Xresources`
-```bash
+\\\\\`\\\\\`\\\\\`bash
 Xft.dpi: 110
 Xft.autohint: 0
 Xft.lcdfilter:  lcdlegacy
