@@ -4,7 +4,7 @@
 
 To enable weekly filesystem trim on your SSDs, run the following command:
 
-``bash
+```bash
 sudo systemctl enable fstrim.timer --now
 ```
 
