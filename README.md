@@ -447,7 +447,7 @@ Make the script:
 # This command frees only RAM cache
 #echo "echo 3 > /proc/sys/vm/drop_caches"
 # This command frees RAM cache and swap
-su -c "echo 3 >'/proc/sys/vm/drop_caches' && swapoff -a && swapon -a && printf 'n%sn' 'Ram-cache and Swap Cleared'" root
+su -c "echo 3 > /proc/sys/vm/drop_caches && swapoff -a && swapon -a && printf '\n%s\n' 'Ram-cache and Swap Cleared'" root
 ```
 
 Make it executable:
@@ -538,21 +538,21 @@ Create `/etc/pdnsd.conf` like so:
 
 ```ini
 global {
-	perm_cache=1024;
-	cache_dir="/var/cache/pdnsd";
-#	pid_file = /var/run/pdnsd.pid;
-	run_as="pdnsd";
-	server_ip = 127.0.0.1;  # Use eth0 here if you want to allow other
-				# machines on your network to query pdnsd.
-	status_ctl = on;
-#	paranoid=on;       # This option reduces the chance of cache poisoning
-	                   # but may make pdnsd less efficient, unfortunately.
-	query_method=udp_tcp;
-	min_ttl=15m;       # Retain cached entries at least 15 minutes.
-	max_ttl=1w;        # One week.
-	timeout=10;        # Global timeout option (10 seconds).
-	neg_domain_pol=on;
-	udpbufsize=1024;   # Upper limit on the size of UDP messages.
+    perm_cache=1024;
+    cache_dir="/var/cache/pdnsd";
+    # pid_file = /var/run/pdnsd.pid;
+    run_as="pdnsd";
+    server_ip = 127.0.0.1;  # Use eth0 here if you want to allow other
+                            # machines on your network to query pdnsd.
+    status_ctl = on;
+    # paranoid=on;       # This option reduces the chance of cache poisoning
+                         # but may make pdnsd less efficient, unfortunately.
+    query_method=udp_tcp;
+    min_ttl=15m;       # Retain cached entries at least 15 minutes.
+    max_ttl=1w;        # One week.
+    timeout=10;        # Global timeout option (10 seconds).
+    neg_domain_pol=on;
+    udpbufsize=1024;   # Upper limit on the size of UDP messages.
 }
 
 server {
@@ -564,17 +564,17 @@ server {
 }
 
 source {
-	owner=localhost;
-#	serve_aliases=on;
-	file="/etc/hosts";
+    owner=localhost;
+    # serve_aliases=on;
+    file="/etc/hosts";
 }
 
 rr {
-	name=localhost;
-	reverse=on;
-	a=127.0.0.1;
-	owner=localhost;
-	soa=localhost,root.localhost,42,86400,900,86400,86400;
+    name=localhost;
+    reverse=on;
+    a=127.0.0.1;
+    owner=localhost;
+    soa=localhost,root.localhost,42,86400,900,86400,86400;
 }
 ```
 
@@ -608,137 +608,187 @@ Create a new profile for SVP and add it to the config file. This is my completed
 - Edit  `~/.config/mpv/mpv.conf` to include the following:
 
 ```bash
-# --- // Constants:
+## --- // MPV.CONF // ========
+
+# --- // GENERAL_SETTINGS:
 --loop-file=inf
 --speed=0.50
-osc=no
-#--loop-playlist=yes
-ontop=yes
-#border=no
-window-scale=0.4
-geometry=100%:100%
+#--profile=fast  # Profile "fast" can be re-enabled if quick startup and playback is prioritized
+--video-output-levels=full
+--sub-visibility=no
+--input-ipc-server=/tmp/mpvsocket  # Re-enabled for use with SVP or other scripts that may require it
+--hwdec=auto-copy  # Ensure hardware decoding is active, depending on your GPU and driver
+#--hwdec=auto-safe  # This can be re-enabled if you experience issues with auto-copy
 
-# --- // SVP_PROFILE:
---profile-add= svp
-
-[svp]
---input-ipc-server=/tmp/mpvsocket
---hr-seek-framedrop=no
---opengl-early-flush=yes
---vf= format=fmt=yuv420p
-hwdec=auto-copy
-hwdec-codecs=all
---no-resume-playback
---ignore-path-in-watch-later-config=yes
+# --- // WAYLAND:
+--wayland-app-id=Mpv
+--wlshm
 
 # --- // PLAYER_SETTINGS //
-#--loop-playlist=yes
+# The settings below are adjusted for flexibility with various content types
+# Re-enable profiles as needed depending on your media type
 #setpts=PTS*2
-#--vd-lavc-dr=yes
-#--vd-lavc-assume-old-x264= yes
-#--user-agent=libmpv
-#--x11-bypass-compositor=no
-#--player-operation-mode= pseudo-gui
---sub-visibility=no
-#--video-output-levels= full
-#--override-display-fps= 60
-#--rar-list-all-volumes= yes
-#--directory-mode= recursive
-#--corner-rounding= 1
+#no-correct-pts
+#vd-lavc-dr=yes
+#vd-lavc-assume-old-x264= yes
+#user-agent=libmpv
+--x11-bypass-compositor=no
+--player-operation-mode=pseudo-gui
+#rar-list-all-volumes= yes
+#directory-mode=recursive
+#corner-rounding=1
+--save-position-on-quit  # Re-enabled to save playback positions across sessions
 
 # --- // AUDIO_SETTINGS //
-#--video-sync=desync
-#--video-sync= display-resample
-#--audio-device=
-#--alsa/sysdefault:CARD= PCH
-#audio-pitch-correction=no
-#audio-channels=5.1
-#audio-channels=auto
-#volume-max=250
-#--no-audio
+# --video-sync=desync
+# --video-sync=display-resample
+# --audio-device=
+# --alsa/sysdefault:CARD=PCH
+# audio-pitch-correction=no
+# audio-channels=5.1
+# audio-channels=auto
+volume-max=250  # This setting has been retained, but ensure your volume requirements are met
+#--no-audio  # Keep this disabled unless you specifically want to mute audio during playback
 
-# --- // WINDOW_MARGINS //
-#--window-scale= 0.500
-#geometry=50%:50%
-#--snap-window= yes
-#--spirv-compiler= shaderc
---stop-screensaver= always
-#--osd-blur= 2
-#--osd-border-size= 1
-#--osd-duration= 8000
-#--osd-on-seek= msg-bar
-#--force-window= immediate
-#--force-seekable= yes
-#--display-tags= Title, Channerl_URL, service_name
-#--fs= no
-#--autofit-smaller= yes
-#--geometry=50%+10+10/2
-#--geometry=100%:100%
-#--keep-open=always
-#--keep-open-pause=no
-#--taskbar-progress=yes
-#--term-title= yes
---title= ${?media-title:${media-title}}- mpv
-#--no-border
-#--osd-level=1
-#--osd-bar=no
-#save-position-on-quit=yes
-#--video-rotate=<0-359|no>
-#keepaspect=no
-#--ontop= yes
-#--on-all-workspaces= yes
+# --- // WINDOW //
+--window-scale=0.500
+--ontop=yes  # Ensure the player stays on top for focused viewing
+--geometry=100%:100%  # This ensures the window scales properly across the full screen
+# --geometry=50%:50%
+# --video-rotate=<0-359|no>
+# keepaspect=no
+# --on-all-workspaces=yes
+# --term-title=yes
+# --title=${?media-title:${media-title}}-mpv
+# --no-border
+# --snap-window=yes
+--stop-screensaver=always  # Retained for preventing the screensaver from interrupting playback
+# --osd-blur=2
+# --osd-border-size=1
+# --osd-duration=8000
+# --osd-on-seek=msg-bar
+# --force-window=immediate
+# --force-seekable=yes
+# --display-tags=Title, Channel_URL, service_name
+--autofit-larger=88%
+# --autofit-larger=30%x30%
+# --autofit-smaller=yes
+# --geometry=50%+10+10/2
+--keep-open=always  # Retained for keeping the player open after playback
+--keep-open-pause=no
+layout=slimbox  # Ensuring a minimalistic layout for better viewing experience
+#seekbarstyle=diamond
+#seekbarhandlesize=0.6
+#seekbarkeyframes=no
+#seekrangestyle=inverted
+#seekrangeseparate=yes
+#seekrangealpha=213
+#minmousemove=3
+#showwindowed=yes
+#showfullscreen=yes
+#idlescreen=yes
+#scalewindowed=1.0
+#scalefullscreen=1.0
+#scaleforcedwindow=2.0
+#vidscale=no
+
+# --- // OSC //
+# --script-opts=osc-layout=bottombar,osc-seekbarstyle=bar
+--taskbar-progress=yes
+# --term-title=yes
+# --title=${?media-title:${media-title}}-mpv
+# --osd-level=1
+# --osd-bar=no
+--osc=no  # Retained as per your preference; re-enable if you want on-screen controls
+# term-status-msg="Time: ${time-pos}"
 
 # --- // PROFILES //
-#[vdpau]
-#--hqscaling=9
-#--scale=ewa_lanczossharp
-#--scale=bilinear
-#--cscale=bilinear
-#--cscale=spline36
-#--zimg-dither= error-diffusion
-#--zimg-scaler= spline36
-#--zimg-scaler-chroma= spline36
-#--no-correct-pts
-#--deband= yes
-#--deinterlace= yes
-#--interpolation= yes
-#--interpolation-preserve= yes
-#--linear-upscaling= yes
-#--interpolation-threshold= 0.03
-#--tscale-param1= mitchell
-#--tscale-param2= 0.5
-#--sws-scaler= lanczos
-#--sws-fast=no
-#--sws-allow-zimg=yes
-#--zimg-fast=no
-#--tone-mapping-max-boost=2.0
-#sharpen=5
-#--gpu-dumb-mode=yes
-#--gpu-context=wayland
-#vo=gpu
-#vo=gl
-#vo=vdpau
+vo=gpu  # General GPU acceleration; consider enabling specific profiles below depending on the content type
+# --profile=svp
 
-#[Act as a web browser]
-# Pretend to be a web browser. Might fix playback with some streaming sites,
-# but also will break with shoutcast streams.
-#user-agent="Mozilla/5.0"
-#cache=yes
-#demuxer-max-bytes=123400KiB
-#cache-pause=no
-#demuxer-readahead-secs=20
+# --- // SVP_PROFILE:
+# Enabled specific settings for SVP, tailored to smooth playback
+[svp]
+--input-ipc-server=/tmp/mpvsocket
+--hwdec=auto-copy
+--hr-seek=always
+--hr-seek-framedrop=no
+#--vf=format:colormatrix=bt.709  # Adjust this if you notice color issues
+--no-resume-playback
+--ignore-path-in-watch-later-config=yes
+--opengl-early-flush=yes  # Retained for smoother playback with SVP
+
+# --- // VDPAU_PROFILE:
+[vdpau]
+# Enhanced settings for VDPAU (NVIDIA hardware acceleration)
+# --hqscaling=9
+# --scale=ewa_lanczossharp
+# --scale=bilinear
+# --cscale=bilinear
+# --cscale=spline36
+# --zimg-dither=error-diffusion
+# --zimg-scaler=spline36
+# --zimg-scaler-chroma=spline36
+# --deband=yes
+# --deinterlace=yes
+# --interpolation=yes
+# --interpolation-preserve=yes
+# --linear-upscaling=yes
+# --interpolation-threshold=0.03
+# --tscale-param1=mitchell
+# --tscale-param2=0.5
+# --sws-scaler=lanczos
+# --sws-fast=no
+# --sws-allow-zimg=yes
+# --zimg-fast=no
+# --tone-mapping=bt.2390
+# --tone-mapping-max-boost=3.0
+# --gpu-dumb-mode=yes
+# --gpu-context=wayland
+
+# --- // EYE_CANCER_PROFILE:
+# [eye-cancer]
+# sharpen=5
+
+# --- // PYRADIO:
+# [pyradio]
+# volume=50
+
+# --- // WEB_BROWSER:
+[Act as a web browser]
+# Updated user-agent for better compatibility with streaming sites
+user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:121.0) Gecko/20100101 Firefox/121.0"
+# --cache=yes
+# --demuxer-max-bytes=123400KiB
+# --cache-pause=no
+# --demuxer-readahead-secs=20
+
+# --- // ANIME4K:
+# [anime4k]
+# --glsl-shaders=/usr/share/anime4k
+
+# --- // Play_with_mpv:
+# [play_with_mpv]
+# ontop=yes
+# border=no
+# window-scale=0.4
+# geometry=100%:100%
+
+# --- // IMAGES //
+--vo-image-format=png
+--vo-image-png-compression=9
+--vo-image-png-filter=5
+--image-display-duration=inf
 
 # --- // Screenshots:
 --screenshot-format=png
 --screenshot-png-compression=0
 --screenshot-directory="~/Pictures/Screens"
 --screenshot-template="%F - [%P]v%#01n"
-#--screenshot-webp-lossless=yes
-#--screenshot-webp-quality=100
+# --screenshot-webp-lossless=yes
+# --screenshot-webp-quality=100
 
 # --- // Extension_behavior:
-image-display-duration=inf
-
 [extension.gif]
 loop-file=inf
 
@@ -756,8 +806,8 @@ loop-file=inf
 
 ```bash
 sudo pacman -S libvirt ebtables dnsmasq bridge-utils virt-manager
-sudo gpasswd -a ${USERNAME} libvirt
-sudo gpasswd -a ${USERNAME} kvm
+sudo gpasswd -a ${USER} libvirt
+sudo gpasswd -a ${USER} kvm
 sudo systemctl enable libvirtd
 sudo systemctl start libvirtd
 ```
@@ -790,7 +840,7 @@ QT_QPA_PLATFORMTHEME=qt5ct
 - Add the following to `~/.profile`:
 
 ```
-[ "\$XDG_CURRENT_DESKTOP" = "Openbox" ] || export QT_QPA_PLATFORMTHEME="qt5ct"
+[ "$XDG_CURRENT_DESKTOP" = "Openbox" ] || export QT_QPA_PLATFORMTHEME="qt5ct"
 ```
 
 ## --- // FONTS:
