@@ -11,6 +11,8 @@
 
 # --- // PROMPT:
 PS1='[\u@\h \W]\$💀 '
+alias 00='cat $USER/.bashrc'
+alias 0f='cat $USER/.zshrc'
 
 # --- // PATH:
 if [ -d "$HOME/.bin" ] ;
@@ -21,16 +23,32 @@ if [ -d "$HOME/.local/bin" ] ;
   then PATH="$HOME/.local/bin:$PATH"
 fi
 
-# --- // DOCUMENT_SOURCING:
-#[[ -f "~/.config/shell/aliasrc" ]] || source "~/.config/shell/aliasrc"
-#[[ -f "~/.config/shell/functions/functionsrc" ]] || source "~/.config/shell/functions/functionsrc" 
+if [ -d "/usr/local/bin" ] ;
+then PATH="$PATH:$(find /usr/local/bin -type d | paste -sd ':' -)$PATH"
+fi
+
+if [ -d "/Nas/Build/git/syncing/scr/" ] ;
+then PATH="$PATH:$(find /Nas/Build/git/syncing/scr -type d | paste -sd ':' -)$PATH"
+fi
+
+export PATH="${HOME}/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:"
+export PATH="${PATH}/usr/local/sbin:/opt/bin:/usr/bin/core_perl:/usr/games/bin:"
+
+[[ -f /home/andro/.config/shell/functions/functionsrc ]] || source "/home/andro/.config/shell/functions/functionsrc" 2>/dev/null/
+[[ -f /home/andro/.config/shell/aliasrc ]] || source "/home/andro/.config/shell/aliasrc"
+
 # --- // ENV:
 HISTCONTROL=ignoreboth
 HISTTIMEFORMAT="%Y-%m-%d %T "
-bind "set completion-ignore-case on"
-[[ -f /home/andro/.config/shell/functions/functionsrc ]] || source "/home/andro/.config/shell/functions/functionsrc" 2>/dev/null/
-alias 00='cat $USER/.bashrc'
-alias 0f='cat $USER/.zshrc'
+shopt -s cdspell
+complete -cf 
+shopt -s autocd
+shopt -s checkwinsize
+run-help() { help "$READLINE_LINE" 2>/dev/null || man "$READLINE_LINE"; }
+bind -m vi-insert -x '"\eh": run-help'
+bind -m emacs -x     '"\eh": run-help'
+
+
 
 # --- // COLOR_TERM:
 if [ "$TERM" = "linux" ]; then
@@ -165,17 +183,7 @@ alias lshare='goto ~/.local/share/'
 
 #//23.1: Navigation to various directories under /23.1
 alias 23='goto /23.1'
-alias 23dl='goto /23.1/Downloads'
-alias rtg='goto /23.1/Video/RTG\ Gifs'
 alias cloud='goto /23.1/Thecloud'
-alias 23v='goto /23.1/video'
-alias 23i='goto /23.1/Images'
-alias 23jd='goto /23.1/JD'
-alias 23p='goto /23.1/Pictures'
-alias 23e='goto /23.1/Edits'
-alias 23sr='goto /23.1/Screenrecorder'
-alias 23ss='goto /23.1/Screenshots'
-alias 23sync='goto /23.1/3sync'
 
 #//Nas: Navigation to various directories under /Nas
 alias nas='goto /Nas/'
@@ -204,7 +212,7 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
-alias s='sudo'
+alias p='pacman'
 alias cp='cp -iv'
 alias mv='mv -iv'
 alias rm='rm -vI'
@@ -319,12 +327,19 @@ alias oint='foot -e "$@" &>/dev/null &'
 
 
 # --- // EXPRESSVPN //
-alias vpnc='sudo expressvpn connect'
-alias vpnd='sudo expressvpn disconnect'
-alias vpns='sudo expressvpn status'
-alias vpnr='sudo expressvpn refresh'
-alias vpnauto='expressvpn autoconnect true'
-alias vpnset='sudo expressvpn preferences set '
+alias vpnc='expressvpn connect'
+alias vpnd='expressvpn disconnect'
+alias vpns='expressvpn status'
+alias vpnr='expressvpn refresh'
+alias vpna='autoconnect true'
+alias vpnset='expressvpn preferences set '
+alias vpnblock='expressvpn preferences set block_all false'  
+alias vpnlight='expressvpn protocol lightway_udp'
+alias vpnauto='expressvpn protocol auto'
+alias vpnv6='expressvpn preferences set ipv6_protection false'
+alias vpnlock='expressvpn preferences set network_lock strict'
+alias vpncipher='expressvpn preferences set lightway_cipher auto'
+
 
 # --- // DISPLAY //
 alias xd='ls /usr/share/xsessions'
@@ -362,10 +377,10 @@ alias fixdirmngr='sudo dirmngr </dev/null'
 
 # ======================================================= // BASIC_FUNCTIONS //
 # --- // Sudo:
-sudo_func() {
-    sudo -v
-    sudo "$@"
-}
+#sudo_func() {
+#    sudo -v
+#    sudo "$@"
+#}
 gclone() {
     git clone --depth 1 "$@" && \
       cd -- "$(basename "$1" .git)" || exit

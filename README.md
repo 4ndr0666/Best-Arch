@@ -9,9 +9,7 @@ sudo systemctl enable fstrim.timer --now
 ```
 
 ### Explanation:
-- **Title Change**: Simplified the section title for clarity and consistency.
-- **Command Block**: Used a proper code block to highlight the command.
-- **Explanation Added**: Included a brief explanation to inform users why they should run this command.
+- **Filesystem Trim**: This command schedules a weekly trim operation to remove blocks no longer in use by the filesystem, which helps maintain SSD performance over time.
 
 ---
 
@@ -25,11 +23,16 @@ DefaultTimeoutStartSec=5s
 DefaultTimeoutStopSec=5s
 ```
 
+### Explanation:
+- **Reboot Speed**: These settings reduce the delay during system start, stop, and reboot processes, ensuring quicker transitions.
+
+---
+
 ## Enable Parallel Compilation & Compression with Makepkg
 
 To optimize the package building process, you can enable parallel compilation and compression by editing the `/etc/makepkg.conf` file:
 
-1. **Parallel Compilation**: 
+1. **Parallel Compilation**:
     - Add the following line to utilize all but one CPU thread:
     ```bash
     MAKEFLAGS="-j$(nproc)"
