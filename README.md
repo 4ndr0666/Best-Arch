@@ -432,7 +432,7 @@ sudo swapon /home/swapfile # this enables the swap file for the current session
 
 Edit `/etc/fstab` adding the following line:
 
-```shell
+```bash
 /home/swapfile none swap defaults 0 0
 ```
 
@@ -478,7 +478,7 @@ crontab -e
 
 Append the below line, save and exit to run it at 2 am daily:
 
-```shell
+```bash
 0  2  *  *  *  /usr/local/bin/freecache
 ```
 
@@ -490,7 +490,7 @@ Append the below line, save and exit to run it at 2 am daily:
 
 Add this line to a file inside `/etc/sysctl.d/` (ie: `99-sysctl.conf`)
 
-```shell
+```bash
 kernel.sysrq=1
 ```
 
@@ -605,7 +605,7 @@ sudo systemctl start dnscrypt-proxy.service pdnsd.service
 
 Edit your NetworkManager configuration to point to the following IPs for respectively IPv4 and IPv6 DNSes:
 
-```shell
+```bash
 127.0.0.1
 ::1
 ```
@@ -776,10 +776,9 @@ loop-file=inf
 
 ### input.conf
 
-
 Edit  `~/.config/mpv/input.conf` to include the following:
 
-```shell
+```bash
 # Author: 4ndr0666
 # ====================================== // INPUT.CONF //
 
@@ -908,7 +907,6 @@ I              vf toggle format=yuv420p,vapoursynth=~/scripts/vapoursynth.vpy:4:
 # ALT+DOWN         add window-scale -0.05
 ```
 
-```bash
 ## Setup libvirt
 
 ```bash
