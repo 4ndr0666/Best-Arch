@@ -1,4 +1,4 @@
-# --- // BEST_ARCH // ========
+# Best Arch
 
 ## SSDs: Enable Weekly Filesystem Trim
 
@@ -8,7 +8,8 @@ To enable weekly filesystem trim on your SSDs, run the following command:
 sudo systemctl enable fstrim.timer --now
 ```
 
-### Explanation:
+### Explanation
+
 - **Filesystem Trim**: This command schedules a weekly trim operation to remove blocks no longer in use by the filesystem, which helps maintain SSD performance over time.
 
 ---
@@ -23,7 +24,8 @@ DefaultTimeoutStartSec=5s
 DefaultTimeoutStopSec=5s
 ```
 
-### Explanation:
+### Explanation
+
 - **Reboot Speed**: These settings reduce the delay during system start, stop, and reboot processes, ensuring quicker transitions.
 
 ---
@@ -34,23 +36,29 @@ To optimize the package building process, you can enable parallel compilation an
 
 1. **Parallel Compilation**:
     - Add the following line to utilize all but one CPU thread:
+
     ```bash
     MAKEFLAGS="-j$(nproc)"
     ```
+
     - Replace `$(nproc)` with your CPU's thread count minus one (e.g., `-j7` for an 8-thread CPU).
 
 2. **Faster Compression with Pigz**:
     - Install `pigz` (Parallel Implementation of Gzip):
+
     ```bash
     sudo pacman -S pigz
     ```
+
     - Modify the compression settings:
-    ```bash
+
+   ```bash
     COMPRESSXZ=(xz -c -z - --threads=0)
     COMPRESSGZ=(pigz -c -f -n)
     ```
 
-### Explanation:
+### Explanation
+
 - **Parallel Compilation**: `MAKEFLAGS="-j$(nproc)"` tells `makepkg` to use multiple CPU cores during the build process, speeding up compilation.
 - **Compression Settings**: Replacing `gzip` with `pigz` allows for parallel compression, which is significantly faster on multi-core processors.
 
@@ -58,9 +66,9 @@ After editing the file, the changes will take effect the next time you build a p
 
 ---
 
-## --- // GPU:
+## GPU
 
-### --- // Intel GPU early kernel mode setting:
+### Intel GPU early kernel mode setting
 
 Ensure the modules `intel_agp i915` are first in the `MODULES` array in `/etc/mkinitcpio.conf`.
 
@@ -78,7 +86,7 @@ sudo grub-mkconfig -o /boot/grub/grub.cfg
 
 **NOTE**: on some systems (Intel+AMD GPU) adding `intel_agp` can cause issues with resume from hibernation. [Reference](https://wiki.archlinux.org/title/Kernel_mode_setting#Early_KMS_start).
 
-### --- // Fix screen tearing:
+### Fix screen tearing
 
 Edit `/etc/X11/xorg.conf.d/`, add the following conf file: `20-intel.conf`
 
@@ -94,13 +102,14 @@ EndSection
 sudo mkinitcpio -p linux
 ```
 
-### --- // Enable betterscreen suspend service:
+### Enable betterscreen suspend service
 
 ```bash
 sudo systemctl enable betterlockscreen@${USER}.service
 ```
 
-### --- // AMD hwdec:
+### AMD hwdec
+
 ```bash
 sudo pacman -S libva-mesa-driver mesa-vdpau
 ```
@@ -355,13 +364,13 @@ sudo systemctl enable arch-audit.timer
 sudo systemctl start arch-audit.timer
 ```
 
-*   You can check the status of the timer with:
+- You can check the status of the timer with:
 
 ```bash
 sudo systemctl status arch-audit.timer
 ```
 
-*   To see the next scheduled run:
+- To see the next scheduled run:
 
 ```bash
 sudo systemctl list-timers arch-audit.timer
@@ -421,7 +430,7 @@ sudo swapon /home/swapfile # this enables the swap file for the current session
 
 Edit `/etc/fstab` adding the following line:
 
-```
+```shell
 /home/swapfile none swap defaults 0 0
 ```
 
@@ -454,17 +463,20 @@ su -c "echo 3 > /proc/sys/vm/drop_caches && swapoff -a && swapon -a && printf '\
 ```
 
 Make it executable:
+
 ```bash
 chmod 755 freecache
 ```
 
 Make the crontab:
+
 ```bash
 crontab -e
 ```
 
 Append the below line, save and exit to run it at 2 am daily:
-```
+
+```shell
 0  2  *  *  *  /usr/local/bin/freecache
 ```
 
@@ -476,13 +488,13 @@ Append the below line, save and exit to run it at 2 am daily:
 
 Add this line to a file inside `/etc/sysctl.d/` (ie: `99-sysctl.conf`)
 
-```
+```shell
 kernel.sysrq=1
 ```
 
-# Package Management
+## Package Management
 
-## Switch to better mirrors
+### Switch to better mirrors
 
 [Arch Wiki reference](https://wiki.archlinux.org/index.php/Reflector)
 
@@ -499,9 +511,9 @@ Edit `/etc/makepkg.conf`:
 - Edit the row saying `COMPRESSXZ=(xz -c -z -)` to `COMPRESSXZ=(xz -c -z - --threads=0)`
 - `sudo pacman -S pigz` and edit the row saying `COMPRESSGZ=(gzip -c -f -n)` to `COMPRESSGZ=(pigz -c -f -n)`
 
-# Networking
+## Networking
 
-## DNSCrypt
+### DNSCrypt
 
 [Arch Wiki reference](https://wiki.archlinux.org/index.php/DNSCrypt)
 
@@ -591,12 +603,12 @@ sudo systemctl start dnscrypt-proxy.service pdnsd.service
 
 Edit your NetworkManager configuration to point to the following IPs for respectively IPv4 and IPv6 DNSes:
 
-```
+```shell
 127.0.0.1
 ::1
 ```
 
-# Mpv
+## Mpv
 
 - Install the smooth video project or [SVP4](https://www.svp-team.com/wiki/SVP:Linux)
 
@@ -721,7 +733,7 @@ vo=gpu  # General GPU acceleration; consider enabling specific profiles below de
 --ignore-path-in-watch-later-config=yes
 --opengl-early-flush=yes  # Retained for smoother playback with SVP
 
-# --- // VDPAU_PROFILE:
+## VDPAU_PROFILE:
 [vdpau]
 # Enhanced settings for VDPAU (NVIDIA hardware acceleration)
 # --hqscaling=9
@@ -836,19 +848,20 @@ Make sure to relogin after following the steps above. To create a network:
 - Open up the `qt5ct` application and select your favorite Adwaita flavor with the default color scheme and press apply
 - Add the following to `~/.pam_environment`:
 
-```
+```bash
 QT_QPA_PLATFORMTHEME=qt5ct
 ```
 
 - Add the following to `~/.profile`:
 
-```
+```bash
 [ "$XDG_CURRENT_DESKTOP" = "Openbox" ] || export QT_QPA_PLATFORMTHEME="qt5ct"
 ```
 
-## --- // FONTS:
+## Fonts
 
 Edit `~/.Xresources`
+
 ```bash
 Xft.dpi: 110
 Xft.autohint: 0
