@@ -38,9 +38,9 @@ To optimize the package building process, you can enable parallel compilation an
 
     - Add the following line to utilize all but one CPU thread:
 
-    ```bash
-    MAKEFLAGS="-j$(nproc)"
-    ```
+```bash
+MAKEFLAGS="-j$(nproc)"
+```
 
     - Replace `$(nproc)` with your CPU's thread count minus one (e.g., `-j7` for an 8-thread CPU).
 
