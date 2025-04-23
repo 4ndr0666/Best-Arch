@@ -610,7 +610,7 @@ Edit your NetworkManager configuration to point to the following IPs for respect
 
 ## Mpv
 
-- Install the smooth video project or [SVP4](https://www.svp-team.com/wiki/SVP:Linux)
+- Install [SVP4](https://www.svp-team.com/wiki/SVP:Linux)
 
 Ensure all i915 intel packages with:
 
@@ -618,203 +618,151 @@ Ensure all i915 intel packages with:
 yay --needed --noconfirm libva-intel-driver vulkan-intel libvdpau-va-gl lib32-vulkan-intel vulkan-intel libva-intel-driver libva-utils lib32-mesa mesa libva libva-mesa-driver libva-vdpau-driver libva-utils lib32-libva lib32-libva-intel-driver lib32-libva-mesa-driver lib32-libva-vdpau-driver intel-ucode iucode-tool vulkan-intel lib32-vulkan-intel intel-gmmlib intel-graphics-compiler intel-compute-runtime intel-gpu-tools intel-media-driver intel-media-sdk intel-opencl-clang libmfx
 ```
 
-Create a new profile for SVP and add it to the config file. This is my completed mpv.conf file and here is how to add the svp profile.
-
-- Edit  `~/.config/mpv/mpv.conf` to include the following:
+Edit  `~/.config/mpv/mpv.conf` to include the following:
 
 ```bash
-## --- // MPV.CONF // ========
+#
+# Author: 4ndr0666
+# ================================ // MPV.CONF //
 
-# --- // GENERAL_SETTINGS:
---loop-file=inf
---speed=0.50
-#--profile=fast  # Profile "fast" can be re-enabled if quick startup and playback is prioritized
---video-output-levels=full
---sub-visibility=no
---input-ipc-server=/tmp/mpvsocket  # Re-enabled for use with SVP or other scripts that may require it
---hwdec=auto-copy  # Ensure hardware decoding is active, depending on your GPU and driver
-#--hwdec=auto-safe  # This can be re-enabled if you experience issues with auto-copy
+## General
+loop-file=inf
+speed=0.50
+hwdec=auto-copy
+hwdec-codecs=-cuda
+gpu-context=wayland
+vo=gpu
+# vo=wlshm
+opengl-early-flush=yes
+x11-bypass-compositor=no
+#display-fps-override=60
+wayland-internal-vsync=no
+#hr-seek-framedrop=no
+no-resume-playback
+#gpu-api-set=opengl
+# stop-playback-on-init-failure
 
-# --- // WAYLAND:
---wayland-app-id=Mpv
---wlshm
+## Audio
+volume-max=250
+audio-pitch-correction=yes
+af="acompressor=ratio=4,loudnorm"
+# alsa/sysdefault:CARD=PCH
+#video-sync=display-resample-desync
+video-sync=desync
+#video-sync=display-resample
+#no-audio
 
-# --- // PLAYER_SETTINGS //
-# The settings below are adjusted for flexibility with various content types
-# Re-enable profiles as needed depending on your media type
-#setpts=PTS*2
-#no-correct-pts
-#vd-lavc-dr=yes
-#vd-lavc-assume-old-x264= yes
-#user-agent=libmpv
---x11-bypass-compositor=no
---player-operation-mode=pseudo-gui
-#rar-list-all-volumes= yes
-#directory-mode=recursive
-#corner-rounding=1
---save-position-on-quit  # Re-enabled to save playback positions across sessions
-
-# --- // AUDIO_SETTINGS //
-# --video-sync=desync
-# --video-sync=display-resample
-# --audio-device=
-# --alsa/sysdefault:CARD=PCH
-# audio-pitch-correction=no
-# audio-channels=5.1
-# audio-channels=auto
-volume-max=250  # This setting has been retained, but ensure your volume requirements are met
-#--no-audio  # Keep this disabled unless you specifically want to mute audio during playback
-
-# --- // WINDOW //
---window-scale=0.500
---ontop=yes  # Ensure the player stays on top for focused viewing
---geometry=100%:100%  # This ensures the window scales properly across the full screen
-# --geometry=50%:50%
-# --video-rotate=<0-359|no>
-# keepaspect=no
-# --on-all-workspaces=yes
-# --term-title=yes
-# --title=${?media-title:${media-title}}-mpv
-# --no-border
-# --snap-window=yes
---stop-screensaver=always  # Retained for preventing the screensaver from interrupting playback
-# --osd-blur=2
-# --osd-border-size=1
-# --osd-duration=8000
-# --osd-on-seek=msg-bar
-# --force-window=immediate
-# --force-seekable=yes
-# --display-tags=Title, Channel_URL, service_name
---autofit-larger=88%
-# --autofit-larger=30%x30%
-# --autofit-smaller=yes
-# --geometry=50%+10+10/2
---keep-open=always  # Retained for keeping the player open after playback
---keep-open-pause=no
-layout=slimbox  # Ensuring a minimalistic layout for better viewing experience
-#seekbarstyle=diamond
-#seekbarhandlesize=0.6
-#seekbarkeyframes=no
-#seekrangestyle=inverted
-#seekrangeseparate=yes
-#seekrangealpha=213
-#minmousemove=3
-#showwindowed=yes
-#showfullscreen=yes
-#idlescreen=yes
-#scalewindowed=1.0
-#scalefullscreen=1.0
-#scaleforcedwindow=2.0
-#vidscale=no
-
-# --- // OSC //
-# --script-opts=osc-layout=bottombar,osc-seekbarstyle=bar
---taskbar-progress=yes
-# --term-title=yes
-# --title=${?media-title:${media-title}}-mpv
-# --osd-level=1
-# --osd-bar=no
---osc=no  # Retained as per your preference; re-enable if you want on-screen controls
-# term-status-msg="Time: ${time-pos}"
-
-# --- // PROFILES //
-vo=gpu  # General GPU acceleration; consider enabling specific profiles below depending on the content type
-# --profile=svp
-
-# --- // SVP_PROFILE:
-# Enabled specific settings for SVP, tailored to smooth playback
-[svp]
---input-ipc-server=/tmp/mpvsocket
---hwdec=auto-copy
---hr-seek=always
---hr-seek-framedrop=no
-#--vf=format:colormatrix=bt.709  # Adjust this if you notice color issues
---no-resume-playback
---ignore-path-in-watch-later-config=yes
---opengl-early-flush=yes  # Retained for smoother playback with SVP
-
-## VDPAU_PROFILE:
-[vdpau]
-# Enhanced settings for VDPAU (NVIDIA hardware acceleration)
-# --hqscaling=9
-# --scale=ewa_lanczossharp
-# --scale=bilinear
-# --cscale=bilinear
-# --cscale=spline36
-# --zimg-dither=error-diffusion
-# --zimg-scaler=spline36
-# --zimg-scaler-chroma=spline36
-# --deband=yes
-# --deinterlace=yes
-# --interpolation=yes
-# --interpolation-preserve=yes
-# --linear-upscaling=yes
-# --interpolation-threshold=0.03
-# --tscale-param1=mitchell
-# --tscale-param2=0.5
-# --sws-scaler=lanczos
-# --sws-fast=no
-# --sws-allow-zimg=yes
-# --zimg-fast=no
-# --tone-mapping=bt.2390
-# --tone-mapping-max-boost=3.0
-# --gpu-dumb-mode=yes
-# --gpu-context=wayland
-
-# --- // EYE_CANCER_PROFILE:
-# [eye-cancer]
-# sharpen=5
-
-# --- // PYRADIO:
-# [pyradio]
-# volume=50
-
-# --- // WEB_BROWSER:
-[Act as a web browser]
-# Updated user-agent for better compatibility with streaming sites
-user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:121.0) Gecko/20100101 Firefox/121.0"
-# --cache=yes
-# --demuxer-max-bytes=123400KiB
-# --cache-pause=no
-# --demuxer-readahead-secs=20
-
-# --- // ANIME4K:
-# [anime4k]
-# --glsl-shaders=/usr/share/anime4k
-
-# --- // Play_with_mpv:
-# [play_with_mpv]
-# ontop=yes
-# border=no
-# window-scale=0.4
+## Window
+cursor-autohide=2000
+force-window=immediate
+term-status-msg="Time: ${time-pos}"
+taskbar-progress=yes
+player-operation-mode=pseudo-gui
+script-opts=osc-layout=bottombar
+# osd-border-size=1
+osd-font=JetBrainsMono Nerd Font Mono
+osd-font-size=24
+osd-duration=2000
+sub-visibility=yes
+snap-window=yes
+# geometry=50%:50%
+window-scale=0.6
+# geometry=50%:50%
+# autofit-larger=90%x90%
+# save-position-on-quit
+term-osd-bar-chars="──╼ ·"
+# osd-outline-color="#15FFFF"
 # geometry=100%:100%
+# geometry=640x360+0-0
+# keepaspect=no
+geometry=100%:100%
+# geometry=50%:100%
+# autofit-larger=88%x88%
+# autofit-larger=30%x30%
+keep-open-pause=yes
+# display-tags=Title, Channel_URL, service_name
+# osd-playing-msg=File: ${filename}
+# term-title=yes
+script-opts=osc-layout=bottombar,osc-seekbarstyle=bar
+# osd-level=1
+# osd-bar=no
+osc=no
 
-# --- // IMAGES //
---vo-image-format=png
---vo-image-png-compression=9
---vo-image-png-filter=5
---image-display-duration=inf
+## Profiles
+[playdir]
+profile-desc="Playdir profile..."
+loop-file=no
+loop-playlist=yes
+speed=0.5
+shuffle=yes
+keep-open=no
+input-ipc-server=/tmp/mpvsocket
 
-# --- // Screenshots:
---screenshot-format=png
---screenshot-png-compression=0
---screenshot-directory="~/Pictures/Screens"
---screenshot-template="%F - [%P]v%#01n"
-# --screenshot-webp-lossless=yes
-# --screenshot-webp-quality=100
+[enhance]
+profile-desc="Enhance profile..."
+scale=ewa_lanczossharp
+cscale=spline36
+dscale=mitchell
+linear-upscaling=yes
+sigmoid-upscaling=yes
+sharpen=1
 
-# --- // Extension_behavior:
+[slomo]
+profile-desc="Slowmo profile..."
+zimg-dither=error-diffusion
+deinterlace=yes
+interpolation=yes
+interpolation-preserve=yes
+video-sync=display-resample
+
+[svp]
+profile-desc="SVP profile..."
+input-ipc-server=/tmp/mpvsocket
+hwdec=auto-copy
+hr-seek=always
+hr-seek-framedrop=no
+no-resume-playback
+ignore-path-in-watch-later-config=yes
+
+[network]
+profile-desc="Network profile..."
+user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:121.0) Gecko/20100101 Firefox/121.0"
+cache=yes
+cache-pause=no
+demuxer-max-back-bytes=512MiB
+demuxer-readahead-secs=20
+cache-secs=50.0
+profile=fast
+
+[play_with_mpv]
+profile-desc="Play-with-mpv profile..."
+ontop=yes
+border=no
+window-scale=0.4
+geometry=100%:100%
+
+## Images
+vo-image-format=png
+vo-image-png-compression=4
+vo-image-png-filter=2
+vo-image-outdir="/home/andro/Pictures/screenshots"
+image-display-duration=8
+
+## Screenshots
+screenshot-format=png
+screenshot-png-compression=4
+screenshot-png-filter=2
+# screenshot-webp-lossless=yes
+# screenshot-webp-quality=100
+screenshot-directory="/home/andro/Pictures/screenshots"
+screenshot-template="%F - [%P]v%#01n"
+screenshot-tag-colorspace=yes
+
 [extension.gif]
 loop-file=inf
 
 [extension.webm]
 loop-file=inf
-
-[extension.jpg]
---pause=yes
-
-[extension.png]
---pause=yes
 ```
 
 ## Setup libvirt
