@@ -35,6 +35,7 @@ DefaultTimeoutStopSec=5s
 To optimize the package building process, you can enable parallel compilation and compression by editing the `/etc/makepkg.conf` file:
 
 1. **Parallel Compilation**:
+
     - Add the following line to utilize all but one CPU thread:
 
     ```bash
@@ -44,6 +45,7 @@ To optimize the package building process, you can enable parallel compilation an
     - Replace `$(nproc)` with your CPU's thread count minus one (e.g., `-j7` for an 8-thread CPU).
 
 2. **Faster Compression with Pigz**:
+
     - Install `pigz` (Parallel Implementation of Gzip):
 
     ```bash
