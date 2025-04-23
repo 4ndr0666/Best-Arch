@@ -37,24 +37,25 @@ To optimize the package building process, you can enable parallel compilation an
 1. **Parallel Compilation**:
     - Add the following line to utilize all but one CPU thread:
 
-```bash
-MAKEFLAGS="-j$(nproc)"
-```
+    ```bash
+    MAKEFLAGS="-j$(nproc)"
+    ```
+
     - Replace `$(nproc)` with your CPU's thread count minus one (e.g., `-j7` for an 8-thread CPU).
 
 2. **Faster Compression with Pigz**:
     - Install `pigz` (Parallel Implementation of Gzip):
 
-```bash
-sudo pacman -S pigz
-```
+    ```bash
+    sudo pacman -S pigz
+    ```
 
     - Modify the compression settings:
 
-```bash
-COMPRESSXZ=(xz -c -z - --threads=0)
-COMPRESSGZ=(pigz -c -f -n)
-```
+    ```bash
+    COMPRESSXZ=(xz -c -z - --threads=0)
+    COMPRESSGZ=(pigz -c -f -n)
+    ```
 
 ### Explanation
 
