@@ -774,6 +774,141 @@ loop-file=inf
 loop-file=inf
 ```
 
+### input.conf
+
+
+Edit  `~/.config/mpv/input.conf` to include the following:
+
+```shell
+# Author: 4ndr0666
+# ====================================== // INPUT.CONF //
+
+## Unset Prefixes
+
+t                ignore
+t-p              ignore
+
+## Cycles
+
+Space            cycle pause
+t-v              cycle video
+T                cycle ontop
+W                cycle-values video-aspect-override "16:9" "4:3" "2.35:1" "-1" # cycle the video aspect ratio
+i                show-progress
+l                ab-loop
+L                cycle-values loop-file "inf" "no"    # Cycle looping
+I                script-binding osc/visibility        # cycle OSC between never, auto (mouse-move) and always
+H                cycle-values hwdec "auto-copy" "safe"
+
+## Zoom
+
+WHEEL_UP         add video-zoom 0.25
+WHEEL_DOWN       add video-zoom -0.25
+ESC              set fullscreen no                  # leave fullscreen
+w                cycle-values window-scale 1 .5
+
+## Rotate
+
+=                add video-rotate 90
+-                add video-rotate -90
+
+## Speed
+
+[                multiply speed 0.9091
+]                multiply speed 1.1
+\                set speed 1.0
+.                frame-step
+,                frame-back-step
+
+## Screenshots
+
+s                screenshot
+Shift+s          screenshot each-frame
+Ctrl+s           screenshot window
+
+## Seek
+
+LEFT             seek -5 #seek -0.75 - exact
+RIGHT            seek 5  #seek 0.75 - exact
+down             seek -60
+up               seek 60
+# down             no-osd seek -1.50 - exact
+# up               no-osd seek +1.50 - exact
+
+## PLAYLIST
+
+F1               script-binding select/select-playlist
+F2               show-text ${playlist}                # Toggle playlist
+<                playlist-prev
+>                playlist-next
+
+## AUDIO
+
+ctrl++ add audio-delay 0.100           # change audio/video sync by delaying the audio
+ctrl+- add audio-delay -0.100          # change audio/video sync by shifting the audio earlier
+
+## PAN
+
+Alt+left         add video-pan-x -0.05
+Alt+right        add video-pan-x 0.05
+Alt+up           add video-pan-y -0.05
+Alt+down         add video-pan-y 0.05
+0                set video-zoom 0; set video-pan-x 0; set video-pan-y 0
+
+## Profiles
+### NOTE: cannot unset profile
+
+t-p ignore          # Unset prefix
+t-p-e apply-profile enhance ; show-text "Profile: enhance"
+t-p-s apply-profile slomo ; show-text "Profile: slomo"
+t-p-v apply-profile svp ; show-text "Profile: svp"
+t-p-d apply-profile playdir ; show-text "Profile: playdir"
+t-p-n apply-profile network ; show-text "Profile: netowrk"
+
+# MODULES
+
+## VIDEOCLIP:
+
+c                script-binding videoclip-menu-open
+
+## CONSOLE:
+
+%                script-message-to console type "seek 0.5 absolute-percent" 6 #Enter a percent position to seek to and close the console.
+#%                script-message-to console type "seek absolute-percent; keypress ESC" 6 #Enter a percent position to seek to and close the console.
+Ctrl+o           script-message-to console type "loadfile ''; keypress ESC" 11 #Enter a file or URL to play. Tab completes paths in the filesystem.
+
+## Search_Menu:
+
+#F1             script-message-to search_menu show-search-menu binding
+#F2             script-message-to search_menu show-search-menu binding-full
+#F3             script-message-to search_menu show-search-menu command
+#F4             script-message-to search_menu show-search-menu property
+#F8             script-message-to search_menu show-search-menu playlist
+# Alt+a          script-message-to search_menu show-search-menu audio-track
+# Alt+s          script-message-to search_menu show-search-menu sub-track
+
+## Vapoursynth:
+
+I              vf toggle vapoursynth=~/scripts/vapoursynth.vpy
+I              vf toggle format=yuv420p,vapoursynth=~/scripts/vapoursynth.vpy:4:4
+
+## SELECT_FORMAT:
+
+# ctrl+f         script-binding selectformat/menu
+
+## FORMAT_MENU:
+
+# F              script-binding quality_menu/video_formats_toggle
+# Alt+f          script-binding quality_menu/audio_formats_toggle
+
+## PLAY_WITH_MPV:
+
+# `                cycle border
+# ALT+UP           add window-scale 0.05
+# ALT+DOWN         add window-scale -0.05
+```
+
+```bash
 ## Setup libvirt
 
 ```bash
