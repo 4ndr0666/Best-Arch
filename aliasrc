@@ -1,348 +1,35 @@
-#File: /home/$USER/.config/shellz/aliasrc
-#Author: 4ndr0666
-#Edited: 04-26-2024
-#
-# --- // ALIASRC // ========
-
-
-# ==================================================== // QUICK_VIEW //
-
-alias 00='cat ~/.config/shellz/aliasrc'
-alias 0f='cat ~/.config/shellz/functions/functions.zsh'
-alias 0z='cat ~/.zshrc'
-alias 0b='cat ~/.bashrc'
-
-# ===================================== // RECENT_PROGRAMS //
-
-alias jf='sudo -S joshuto'
-alias lf='lfub'
-alias fd1='fd --exact-depth=1 --hidden'
-alias screenrecord="wf-recorder -a"
-alias screenrecord2="wf-recorder -a -c h264_vaapi -C aac -d /dev/dri/renderD128 --file=recording.mp4"
-alias kmon='sudo kmon --color blue --accent-color 15FFFF --unicode'
-# =========================================================== // EXPRESSVPN //
-
-alias vpnc='sudo expressvpn connect'
-alias vpnd='sudo expressvpn disconnect'
-alias vpns='sudo expressvpn status'
-alias vpnr='sudo expressvpn refresh'
-alias vpnauto='expressvpn autoconnect true'
-alias vpnset='sudo expressvpn preferences set '
-alias vpnl='sudo expressvpn list'
-alias vpnblock='sudo expressvpn preferences set block_all false'
-alias vpnproto='sudo expressvpn protocol lightway_udp'
-
-# ================================================================================================ // EDITOR //
-
-if command -v nvim > /dev/null 2>&1; then
-    alias vim="nvim"
-    alias vimdiff="nvim -d"
-else
-    echo "nvim not found, falling back to vim if available"
-    command -v vim > /dev/null 2>&1 || { echo "vim also not found. Please install a text editor."; return 1; }
+# Author: 4ndr0666
+# ===================================== // ALIASRC //
+if [[ -o interactive ]]; then
+    alias reload='exec zsh'
+    alias mkdir='mkdir -pv'
+    alias mkgpg="[ -d ~/.gnupg ] || (mkdir ~/.gnupg && cp /etc/pacman.d/gnupg/gpg.conf ~/.gnupg/ && echo 'done')"
 fi
-alias vim="nvim"
 
-# ============================================================= // REMOVE_SUDO //
+## Ls Configs_____________________________________________________________________
 
-for cmd in pacman-key ufw mount umount pacman updatedb su systemctl useradd userdel groupadd groupdel chown chmod \
-btrfs ip netstat modprobe; do
-    alias $cmd="sudo $cmd"
-done
+### Config 1
 
-# =================================================== // COMMON_TYPOS //
+alias ls='eza -X --no-filesize --no-time --no-permissions --colour-scale=size --colour-scale-mode=gradient --group-directories-first --icons=always --smart-group'
+alias la='eza -alXMoZ --no-quotes --time=created --classify=always --colour-scale=all --colour-scale-mode=gradient --icons=always'
+#'lsd -alLU --permission=rwx --color=always --group-directories-first --icon=always'
+alias ll='eza -xXDh --colour-scale=size --colour-scale-mode=gradient --icons=always --smart-group'
+alias l.='eza -Xd --sort new --colour-scale-mode=gradient --colour-scale=age --group-directories-first --icons=always .[!.]*'
+#exa -aT -s new --color=always --group-directories-first --icons
 
-alias gerp='grep'
-alias shudown='shutdown'
-alias pdw='pwd'
-alias cd..='cd ..'
-
-# ==================================================== // CHEATSHEETS //
-
-cht() {
-    local cheats=("$HOME/.cheater/"*.md)
-    local choice=$(printf "%s\n" "${cheats[@]}" | fzf --prompt="Select a cheat sheet: ")
-    [ -n "$choice" ] && bat "$choice" || echo "No cheat sheet selected."
-}
-
-alias chtvim='cat ~/.cheater/chtvim.md'
-alias chtyay='cat ~/.cheater/yay.md'
-alias chtusername='cat ~/.cheater/chtusername.md'
-alias chtvpn='cat ~/.cheater/chtvpn.md'
-alias chtx='cat ~/.cheater/chtx.md'
-alias chtperms='cat ~/.cheater/chtperms.md'
-alias chtscr='cat ~/.cheater/chtscripts.md'
-alias chtff='cat ~/.cheater/chtffmpeg.md'
-alias chtmicro='cat ~/.cheater/chtmicro.md'
-alias chtpy='cat ~/.cheater/chtpython.md'
-alias bsnip='cat ~/.cheater/bash_snippets.md'
-alias bhead='cat ~/.cheater/bash_header.md'
-alias psnip='cat ~/.cheater/python_snippets.md'
-alias chtutil='cat ~/.cheater/chtutils.md'
-alias chtpkg='cat ~/.cheater/chtpkg.md'
-alias chtgit='cat ~/.cheater/chtgit.md'
-alias chtrsync='cat ~/.cheater/chtrsync.md'
-alias chtyay='cat ~/.cheater/chtyay.md'
-
-# ============================================== // EDIT_CONFIG_FILES //
-
-edit_config() {
-    local file_path=$1
-    if [[ $file_path ]]; then
-        sudo -S nvim "$file_path"
-    else
-        echo "File path not provided."
-    fi
-}
-
-alias svim="edit_config"
-alias valias='edit_config /home/$(whoami)/.config/shellz/aliasrc'
-alias vfunc='edit_config /home/$(whoami)/.config/shellz/functions/functions.zsh'
-alias vpac='edit_config /etc/pacman.conf'
-alias vgrub='edit_config /etc/default/grub'
-alias vgrubc='edit_config /boot/grub/grub.cfg'
-alias vmkinit='edit_config /etc/mkinitcpio.conf'
-alias vmirrors='edit_config /etc/pacman.d/mirrorlist'
-alias vfstab='edit_config /etc/fstab'
-alias vbash='edit_config ~/.bashrc'
-alias vzsh='edit_config ~/.zshrc'
-alias vfish='edit_config ~/.config/fish/config.fish'
-alias vmpv='edit_config /home/andro/.config/mpv/mpv.conf'
-alias vfire='edit_config ~/.config/wayfire.ini'
-
-# ============================================ // DIRECTORY_SHORTCUTS //
-
-goto() {
-    local dir=$1
-    if [[ -d "$dir" ]]; then
-        cd "$dir"
-    else
-        echo "Directory not found: $dir"
-    fi
-}
-
-# --- //$USER:
-alias dc='goto ~/Documents'
-alias dl='goto ~/Downloads'
-alias conf='goto ~/.config'
-alias confw='goto ~/.config/wayfire/'
-alias confwb='goto ~/.config/wayfire/waybar/'
-alias ob='goto ~/.config/openbox'
-alias obt='goto ~/.config/openbox/themes'
-alias hdd='cd /run/media/'
-
-# --- //STORAGE:
-alias s1='goto /storage'
-alias sdl='goto /storage/Downloads'
-alias spic='goto /storage/Pictures'
-alias svid='goto /storage/Videos'
-
-# --- //STO2:
-alias s2'goto /sto2'
-alias s2dl='goto /sto2/Downloads'
-alias s2pic='goto /sto2/Pictures'
-alias s2vid='goto /sto2/Videos'
-
-# --- //23.1: 
-alias 23='goto /23.1'
-alias 23dl='goto /23.1/Downloads'
-alias 23pic='goto /23.1/Pictures'
-alias 23vid='goto /23.1/Videos'
-alias 23e='goto /23.1/Edits'
-alias cloud='goto /23.1/Thecloud'
-
-# --- //Nas: 
-alias nas='goto /Nas/'
-alias b='goto /Nas/Build'
-alias nbin='goto /Nas/Build/git/syncing/scr'
-alias nnas='goto /Nas/Build/git/syncing/nas'
-alias ngpt='goto /Nas/Build/git/syncing/gpt'
-alias ngc='goto /Nas/Build/git/clone'
-alias ngl='goto /Nas/Build/git/local'
-alias npkg='goto /Nas/Build/pkgs'
-alias npro='goto /Nas/Build/projects'
-alias ndot='goto /Nas/Build/git/clone/dotfiles'
-
-# --- //System:
-alias et='goto /etc'
-alias ske='goto /etc/skel'
-alias bin='goto /usr/local/bin'
-alias lbin='goto ~/.local/bin'
-alias lshare='goto ~/.local/share/'
-alias lsrc='goto ~/.local/src/'
-alias shellzsh='goto ~/.config/shellz'
-alias shellbash='goto ~/.config/shell'
-
-# ========================================================== // SCRIPTS_DROPDOWN_MENU //
-
-# --- // $USER/.local/bin //
-slb() {
-	choice="$(find ~/.local/bin -mindepth 1 -printf '%P\n' | fzf)"
-	[ -f "$HOME/.local/bin/$choice" ] && $EDITOR "$HOME/.local/bin/$choice";
-}
-
-# --- // /Nas/Build/git/syncing/scr //
-ms() {
-    local dir="${1:-/Nas/Build/git/syncing/scr}"
-    
-    # Find executable files and directories, excluding .git items, and sorting directories first
-    local choice=$(find "$dir" -mindepth 1 \( -type d -o -executable -type f \) \
-        ! -path '*/.git/*' -printf '%P\n' | \
-        sort -r | \
-        fzf --preview "cat '$dir/{}'" --preview-window=down:70%)
-
-    if [ -n "$choice" ]; then
-        if [ -d "$dir/$choice" ]; then
-            # If the choice is a directory, list its contents
-            echo "Selected directory: $dir/$choice"
-        elif [ -x "$dir/$choice" ]; then
-            # If the choice is an executable file, execute it
-            echo "Executing $dir/$choice ..."
-            "$dir/$choice"
-        else
-            echo "No script selected or script is not executable."
-        fi
-    else
-        echo "No selection made."
-    fi
-}
-
-# =======================================================// OH_MY_ZSH //
-#alias oz="svim ~/.zshrc"
-#alias oc="cd ~/.oh-my-zsh/custom/"
-#alias omzp="echo -e '\033[1;36mPlugins:\033[0m'; awk -F'=' '/^plugins/{gsub(/[\(\)]/, \"\"); split(\$2, a, \" \"); for(i in a) print a[i]}' ~/.zshrc"
-#alias omzl='omz plugin list'
-#alias omzi='omz plugin info'
-
-# ================================================== // BASIC_ALIASES //
-
-alias cd='cd -P'
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-alias .....='cd ../../../..'
-alias ......='cd ../../../../..'
-alias s='sudo'
-alias cp='cp -iv'
-alias mv='mv -iv'
-alias rm='trash-put'          # Aliases for trash-cli
-#alias rm='rm -vI'
-alias rmf='sudo -S /usr/bin/rm -vI -rf'
-alias rg='batgrep'            # Aliased for bat-extras ripgrep
-#alias rg="rg --sort path"
-alias diff='diff --color=auto'
-alias rmdir='rm -vI --preserve root'
-alias ln='ln -iv'
-alias bc='bc -ql'
-alias mkdir='mkdir -pv'
-alias wget="wget -c"
-alias curl="curl --user-agent 'noleak'"
-alias df='df -h --exclude-type=squashfs --exclude-type=tmpfs --exclude-type=devtmpfs'
-alias cat='bat'
-alias showpath='echo $PATH | tr ":" "\n"'
-#alias path='path -l $path'
-alias rsync='rsync -vrPlu'
-alias grub-mkconfig='sudo grub-mkconfig -o /boot/grub/grub.cfg'
-alias grepc='grep --color=always'
-alias egrep='egrep --color=auto'
-alias fgrep='fgrep --color=auto'
-alias lessc='less -R'
-alias ip='ip -color=auto'
-alias c='clear; echo; echo; seq 1 $(tput cols) | sort -R | spark | lolcat; echo; echo'
-alias hw='sudo hwinfo --short'
-alias lsblk='lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT'
-#alias lsblkh='lsblk.sh'
-alias psa='ps auxf | less'
-alias free='free -mt'
-alias jctl='journalctl -p 3 -xb'
-alias g='git'
-alias gstat='git status'
-alias grh="git reset --hard"
-alias gfs='git-lfs'
-alias mapit="ifconfig -a | grep -Po '\b(?!255)(?:\d{1,3}\.){3}(?!255)\d{1,3}\b' | xargs nmap -A -p0-"
-alias ports='netstat -tulanp'
-alias speedtest='curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -'
-alias netspeed='ifstat -t -S -w'
-alias iotop='sudo iotop -o'
-alias netwatch='sudo nethogs'
-alias dir5='du -cksh * | sort -hr | head -5'
-alias dir10='du -cksh * | sort -hr | head -10'
-alias dir='dir --color=auto'
-alias vdir='vdir --color=auto'
-alias z='zathura'
-function back() {
-    local steps=${1:-1}  # Number of steps back in the directory stack, default is 1
-    for ((i = 0; i < steps; i++)); do
-        if [[ $(dirs -p | wc -l) -gt 1 ]]; then
-            cd - # Move to the previous directory in the stack
-        else
-            echo "No more directories in the history."
-            break
-        fi
-    done
-}
-alias tarnow='sudo -S tar cf archive.tar.gz '
-alias untar='sudo -S tar xvf '
-alias watch='watch '
-alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
-
-mem() {
-    local count=${1:-5}
-    echo "Top $count memory-consuming processes:"
-    ps aux --sort=-%mem | awk 'NR==1; NR>1 {print $0}' | head -n $(($count + 1))
-}
-
-cpu() {
-    local count=${1:-5}
-    echo "Top $count CPU-consuming processes:"
-    ps aux --sort=-%cpu | awk 'NR==1; NR>1 {print $0}' | head -n $(($count + 1))
-}
-
-# --- // MEM, POWER, TOP 5:
-#unalias mem5 2>/dev/null
-#mem5() {
-#    ps aux --sort=-%mem | awk '{print $11}' | head -n 6
-#}
-#unalias mem10 2>/dev/null
-#mem10() {
-#    ps aux --sort=-%mem | awk '{print $11}' | head -n 11
-#}
-#unalias cpu5 2>/dev/null
-#cpu5() {
-#    ps aux --sort=-%cpu | awk '{print $11}' | head -n 6
-#}
-#unalias cpu10 2>/dev/null
-#cpu10() {
-#    ps aux --sort=-%cpu | awk '{print $11}' | head -n 11
-#}
-
-# ======================================================================= // LS_CONFIGS //
-
-# --- // Config 1:
-alias mkplaylist="ls -d */ > mpv_playlist.txt"
-alias lb='ls | bat'
-alias l1='lsd -1'
-alias lr='lsd -tr'
-alias ls='exa -hlx --no-filesize --no-time --no-permissions --octal-permissions --color=always --group-directories-first --icons=always'
-alias la="lsd -aFlL --permission=rwx --color=always --group-dirs=first --icon=always"
-alias ll='exa -xXDa --color=always  --icons=always'
-alias l.='exa -ax --sort=modified --color-scale-mode=gradient --color=always --group-directories-first --icons | grep "^\."'
-alias lt='exa -aT -s new --color=always --group-directories-first --icons'
-
-# --- // Config 2:
+### Config 2
+#alias l='ls'
 #alias ls="ls -alhfN --time-style=long-iso --color=auto --group-directories-first"
 #alias ll="ls -lFh --color=auto --group-directories-first --time-style=long-iso"
 #alias la='exa -hFlBgmnsa -s new --git --octal-permissions --group-directories-first --icons'
 #alias lt='ls -ltFh'
 #alias ldot='ls -1FSsh'
-#alias LS='ls -1FSsh'
 #alias lart='ls -1Fcart'
 #alias lrt='ls -1Fcrt'
 #alias lm='ls -m'
-#alias lr='ls -R'
 #alias lg='ls -l --group-directories-first'
 
-# --- // Config 3:
+### Config 3
 #alias l.='ls -d .* --color=auto'
 #alias ll='ls -lh --color=auto'
 #alias la='ls -lha --color=auto'
@@ -350,187 +37,164 @@ alias lt='exa -aT -s new --color=always --group-directories-first --icons'
 #alias lsf='ls -lhS --color=auto | grep -E "^-"'
 #alias lsp='ls -lhS --color=auto | grep -E "^l"'
 
-# ============================================================================= // PERMISSIONS //
+### Config 4
+#alias ls='ls --group-directories-first --color'
+#alias ll='ls -lhF'
+#alias la='ls -lha'
+#alias lt='ls -lhtr'
+#alias lta='ls -lhatr'
 
-alias chown='sudo chown --preserve-root'
-alias chmod='sudo chmod --preserve-root'
-alias chgrp='sudo chgrp --preserve-root'
-alias chgpg='sudo chown -R $USER:$USER ~/.gnupg && sudo chmod 700 ~/.gnupg && sudo chmod 600 ~/.gnupg/private-keys-v1.d/*'
-alias lock='sudo chattr +i '
-alias unlock='sudo chattr -i '
-alias chlocal='sudo chown -R $USER:$USER ~/.config ~/.local && echo "Ownership of ~/.config and ~/.local changed to $USER."'
+### Config 5
+#alias lm='ls | more'
+#alias ll='ls -lFh --group-directories-first'
+#alias la='ls -alFh --group-directories-first'
+#alias l1='ls -1F --group-directories-first'
+#alias l1m='ls -1F --group-directories-first | more'
+#alias lh='ls -ld .??*'
+#alias lsn='\ls | cat -n'
 
-chboot() {
-    sudo chmod -R 755 /boot/efi 
-    sudo chown -R root:root /boot/efi
-    echo "Boot directory permissions reset appropriately."
-}
+## Ls functions__________________________________________________________________________
 
-chdefault() {
-    if [[ -z "$1" ]]; then
-        echo "Usage: chdefault <directory>"
-        return 1
-    elif [[ ! -d "$1" ]]; then
-        echo "Error: '$1' is not a valid directory."
-        return 1
-    fi
+### Ls by Extension
 
-    echo "Setting directory permissions to 755 for: $1"
-    sudo find "$1" -type d -exec chmod 755 {} +
-    echo "Permissions reset successfully for $1."
-}
+alias lse='eza -Xh --sort=extension --no-filesize --no-time --no-permissions --colour=auto --colour-scale=size --colour-scale-mode=gradient --group-directories-first --icons=always --smart-group'
 
-chandro() {
-    if [[ -z "$1" ]]; then
-        echo "Usage: chandro <directory>"
-        return 1
-    elif [[ ! -d "$1" ]]; then
-        echo "Error: '$1' is not a valid directory."
-        return 1
-    fi
+### Ls by Name
 
-    echo "Changing ownership and permissions to $USER for: $1"
-    sudo chown -R $USER:$USER "$1"
-    sudo find "$1" -type d -exec chmod 755 {} +
-    sudo find "$1" -type f -exec chmod 644 {} +  # Adjusted to 644 for files
-    echo "Ownership and permissions set successfully for $1."
-}
+alias lsn='eza -Xh --sort=name --no-filesize --no-time --no-permissions --colour=auto --colour-scale=size --colour-scale-mode=gradient --group-directories-first --icons=always --smart-group'
 
-chroot() {
-    if [[ -z "$1" ]]; then
-        echo "Usage: chroot <directory>"
-        return 1
-    elif [[ ! -d "$1" ]]; then
-        echo "Error: Directory not found."
-        return 1
-    fi
+### Ls files only
 
-    echo "Setting ownership to root and permissions to 755 (directories) and 644 (files) for: $1"
-    sudo find "$1" -type d -exec chmod 755 {} +
-    sudo find "$1" -type f -exec chmod 644 {} +
-    sudo chown -R root:root "$1"
-    echo "Ownership and permissions set successfully for $1."
-}
+alias lsf='eza -xrf --colour=always --colour-scale=age --colour-scale-mode=gradient --icons=always'
+
+### Ls Most Recent Files Last
+
+alias lr='lsd -tr'
+#eza -XGx --no-filesize --no-permissions --no-user --sort modified --group-directories-first --icons=always --colour-scale=age --colour-scale-mode=gradient'
+
+### List All Modified Files in Past 60 min
+
+alias ls60='sudo find / -mmin 60 -type f'
+
+### List Files & Dirs Modified in Past Day
+
+alias lsfdday='\ls *(m0)'
+
+### List Files Modified in Past Day
+
+alias lsfday='\ls *(.m0)'
+
+### List 10 Newest
+
+alias lsnew='\ls *(.om[1,10])'
+
+### List Most Recent Subdir
+
+alias lssubdir='\ls -d *(/om[1])'
+
+### Unknown
+
+alias LS='\ls -1FSsh'
+
+### Ls with Bat
+
+alias lb='\ls | bat'
+
+### Ls on One Line
+
+alias l1='lsd -1'
+
+### Ls symlinks
+
+alias lta='\ls -ltrha'
 
 
-chpython() {
-    local python_version
-    python_version=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
+## Login Manager
 
-    local site_packages_dir="/usr/lib/python${python_version}/site-packages"
-
-    if [[ -d "$site_packages_dir" ]]; then
-        echo "Setting ownership to root and permissions to 755 for: $site_packages_dir"
-        sudo chown -R root:root "$site_packages_dir"
-        sudo chmod -R 755 "$site_packages_dir"
-        echo "Ownership and permissions set successfully for $site_packages_dir."
-    else
-        echo "Error: Directory $site_packages_dir not found for Python version $python_version."
-    fi
-}
-
-chexcept() {
-    if [[ -z "$1" ]]; then
-        echo "Usage: chexcept <directory>"
-        return 1
-    elif [[ ! -d "$1" ]]; then
-        echo "Error: Directory not found."
-        return 1
-    fi
-
-    read -r -p "Enter the directory name to exclude: " exclude_dir
-    if [[ -z "$exclude_dir" ]]; then
-        echo "Error: No directory specified to exclude."
-        return 1
-    fi
-
-    echo "Setting permissions for $1, excluding $exclude_dir"
-    sudo find "$1" -type d -not -name "$exclude_dir" -exec chmod 755 {} +
-    sudo find "$1" -type f -not -path "*/$exclude_dir/*" -exec chmod 644 {} +
-    sudo chown -R root:root "$1"
-    echo "Permissions set successfully for $1, excluding $exclude_dir."
-}
-
-# ======================================================================== // UNIQUE_ALIASES //
-
-# --- // Retries cmd until executes:
-alias retry='until !!; do :; done'
-
-# --- // Backup & restore skel from recover dir:
-alias bupskel='sudo cp -Rf /etc/skel /var/recover/skel-backup-$(date +"%Y.%m.%d-%H.%M.%S") && echo "Backup of skel made."'
-alias restore='sudo cp -Rf /var/recover/skel-backup-*/. $HOME/ && echo "Restored from latest backup."'
-
-alias ssha='eval $(ssh-agent) && ssh-add'
-alias sshid='xclip -sel clip < ~/.ssh/id_ed25519.pub'
-alias update-grub="sudo grub-mkconfig -o /boot/grub/grub.cfg"
-alias myip='curl icanhazip.com'
-alias fixbootloader='sudo grub-install && sudo grub-mkconfig -o /boot/grub/grub.cfg'
-alias dracutthiskernel='sudo dracut --force --kver=$(uname -r) /boot/initramfs-linux.img'
-alias dracutallkernels='sudo dracut --regenerate-all --fstab --early-microcode --enhanced-cpio --lz4 --force'
-alias top10='print -l ${(o)history%% *} | uniq -c | sort -nr | head -n 10'
-alias pacdiff='sudo -H DIFFPROG=meld pacdiff'
-alias restartntp='sudo systemctl stop ntpd.service && sudo pacman -Syu ntp'
-alias fixntp='sudo ntpd -qg && sleep 10 && sudo hwclock -w'
-alias fixkeyboard='sudo localectl set-x11-keymap us'
-alias listusers='cut -d: -f1 /etc/passwd | sort'
-alias setlocales='sudo localectl set-locale LANG=en_US.UTF-8'
-alias microcode='grep . /sys/devices/system/cpu/vulnerabilities/*'
-alias audio="pactl info | grep 'Server Name'"
-#alias mcut='cat /home/$USER/.config/mpv/scripts/cutter.lua | grep key'
-#alias findit='read -p "Do you want to find a file (f) or a directory (d)? " choice; if [ "$choice" == "f" ]; then read -p "Enter the filename to search for: " filename; sudo find / -type f -name "$filename" 2>/dev/null; elif [ "$choice" == "d" ]; then read -p "Enter the directory name to search for: " dirname; sudo find / -type d -name "$dirname" 2>/dev/null; else echo "Invalid choice. Please select 'f' for file or 'd' for directory."; fi'
-#alias whatsnew='read -p "Do you want to find files based on modification time (m) or access time (a)? " choice; if [ "$choice" == "m" ]; then find "$PWD" -type f -mtime -7 -print0 | xargs -0 ls -lt | head; elif [ "$choice" == "a" ]; then find "$PWD" -type f -atime -7 -print0 | xargs -0 ls -lt | head; else echo "Invalid choice. Please select 'm' for modification time or 'a' for access time."; fi'
-#alias cleanls='echo "pacman -Q | grep -E 'pipewire|pulseaudio|alsa|jack' > audio_packages.txt && sed -i 's/ .*$//' audio_packages.txt"'
-#alias list="xclip -o | tr '\n' ' ' | sed 's/ $/\n/' | xclip -selection c"
-#alias splitlist="xclip -o | tr ',' '\n'"
-#alias copy='xclip -selection clipboard'
-#alias copy='wl-copy <'
-#alias cleanssh="sed -i 18d .ssh/known_hosts"
-# --- // restore shell configs from /etc/skel:
-#alias cb='cp /etc/skel/.bashrc ~/.bashrc && exec bash'
-#alias cz='cp /etc/skel/.zshrc ~/.zshrc && echo "Copied."'
-#alias cf='cp /etc/skel/.config/fish/config.fish ~/.config/fish/config.fish && echo "Copied."'
-#alias swap="sudo swapoff -a; sudo swapon -a"
-#alias mpvplaylist='mpv --input-ipc-server=/tmp/mpvsocket --playlist=/home/andro/mpv_playlist.txt'
-
-# --- // Change_shell:
-alias tobash="sudo chsh $USER -s /bin/bash && echo 'Now log out.'"
-alias tozsh="sudo chsh $USER -s /bin/zsh && echo 'Now log out.'"
-alias tofish="sudo chsh $USER -s /bin/fish && echo 'Now log out.'"
-
-# --- // Display:
-alias xd='ls /usr/share/xsessions'
-alias xdw="ls /usr/share/wayland-sessions"
-alias xfix='echo "DISPLAY=:0 XAUTHORITY=$HOME/.Xauthority xterm"'
-alias xi='sudo xbps-install'
-alias xr='sudo xbps-remove -R'
-alias xq='xbps-query'
-alias xmerge='xrdb -merge ~/.Xresources'
-
-# --- // Switch login managers:
-alias tolightdm="sudo pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm --needed ; sudo systemctl enable lightdm.service -f ; echo 'Lightm is active - reboot now'"
+alias tolightdm="sudo pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings --noconfirm --needed ; sudo systemctl enable lightdm.service -f ; echo 'Lightdm is active - reboot now'"
 alias tosddm="sudo pacman -S sddm --noconfirm --needed ; sudo systemctl enable sddm.service -f ; echo 'Sddm is active - reboot now'"
 alias toly="sudo pacman -S ly --noconfirm --needed ; sudo systemctl enable ly.service -f ; echo 'Ly is active - reboot now'"
 alias togdm="sudo pacman -S gdm --noconfirm --needed ; sudo systemctl enable gdm.service -f ; echo 'Gdm is active - reboot now'"
 alias tolxdm="sudo pacman -S lxdm --noconfirm --needed ; sudo systemctl enable lxdm.service -f ; echo 'Lxdm is active - reboot now'"
 
-# --- // Btrfs:
-alias btrfsfs='sudo btrfs filesystem df /'
-alias btrfsli='sudo btrfs su li / -t'
+## Shell
 
-# --- // Snapper:
-alias snapcroot="sudo snapper -c root create-config /"
-alias snapchome="sudo snapper -c home create-config /home"
-alias snapli="sudo snapper list"
-alias snapcr="sudo snapper -c root create"
-alias snapch="sudo snapper -c home create"
+alias tobash="sudo chsh $USER -s /bin/bash && echo 'Now log out.'"
+alias tozsh="sudo chsh $USER -s /bin/zsh && echo 'Now log out.'"
+alias tofish="sudo chsh $USER -s /bin/fish && echo 'Now log out.'"
 
-# --- // Count or list files in dir: 
-lsfiles() {
+## Wayfire deps
+
+alias refreshwayfire='yay -S wayfire-plugins-extra-git wayfire-git wf-config-git wf-recorder-git wayland-protocols-git wayland-utils qt6-wayland xorg-xwayland-git wlroots-git wlr-protocols-git --noconfirm --overwrite="*" --rebuildtree --redownloadall --refresh --singlelineresults --sudoloop'
+
+## System General Aliases_________________________________________________________________________
+
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ......='cd ../../../../..'
+alias s='sudo'
+alias e='$EDITOR'
+alias v='$EDITOR'
+alias p="sudo pacman"
+alias ka='sudo killall -9'
+alias cp='cp --preserve=all'
+alias cpv='cp --preserve=all -v'
+alias cpr='cp --preserve=all -R'
+alias cpp='rsync -ahzXW --info=progress2'
+alias mv='mv -iv'
+alias rm='rm -vI'
+alias bc='bc -l'
+alias rmf='sudo -S rm -vI -rf'
+alias rg="rg --sort path"
+alias diff='colordiff -yW "$(tput cols)"'
+alias rmdir='rm -vI --preserve root'
+alias ln='ln -iv'
+alias wget="wget -c"
+alias curl="curl --user-agent 'noleak'"
+alias df='df -h --exclude-type=squashfs --exclude-type=tmpfs --exclude-type=devtmpfs'
+#alias cat='bat --paging=never'
+alias ccat="highlight --out-format=ansi"
+alias showpath='echo $PATH | tr ":" "\n"'
+alias rsync='rsync -vrPlu'
+alias unhblock='hblock -S none -D none'
+alias grep='grep --color=auto'
+alias grepc='grep --color=always'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias c='clear; echo; echo; seq 1 $(tput cols) | sort -R | spark | lolcat; echo; echo'
+alias hw='sudo hwinfo --short'
+alias lsb='lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT'
+alias psa='ps auxf | less'
+alias free='free -mt'
+alias jctl='journalctl -p 3 -xb'
+alias mapit="ifconfig -a | grep -Po '\b(?!255)(?:\d{1,3}\.){3}(?!255)\d{1,3}\b' | xargs nmap -A -p0-"
+alias ports='ss -tunlp'
+alias whatsonline='lsof -P -i -n'
+alias speedtest='curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -'
+alias netspeed='ifstat -t -S -w'
+alias dir5='du -cksh * | sort -hr | head -5'
+alias dir10='du -cksh * | sort -hr | head -10'
+alias dir='dir --color=auto'
+alias vdir='vdir --color=auto'
+alias watch='watch'
+alias mem10='ps aux | sort -nk +4 | tail'
+alias pacdiff='sudo -H DIFFPROG=meld pacdiff'
+alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
+alias myip='curl canhazip.com'
+alias mybios='dmidecode -t bios'
+
+## System General Functions_______________________________________________________________________-
+
+### Gather total number of files
+
+filecount() {
     if [[ "$1" == "-l" ]]; then
         echo "Files in $PWD:"
-        find $PWD -type f
+        find "$PWD" -type f
     else
-        echo "Total files in $PWD: $(find $PWD -type f | wc -l)"
+        echo "Total files in $PWD: $(find "$PWD" -type f | wc -l)"
     fi
 }
 
@@ -542,60 +206,29 @@ lsmount() {
     fi
 }
 
-killit() {
-    local pattern=$1
-    if [[ -z "$pattern" ]]; then
-        echo "Error: Please provide a process name or pattern."
-        return 1
-    fi
+### Aggregate Pkgs Deps
 
-    echo "Searching for processes matching '$pattern'..."
-    local pids=$(pgrep -fl "$pattern")
-
-    if [[ -z "$pids" ]]; then
-        echo "No processes found matching '$pattern'."
-        return 1
-    fi
-
-    echo "Found processes:"
-    echo "$pids"
-
-    echo "Please enter the PIDs to kill (separate multiple PIDs with spaces):"
-    read -r pid_list
-
-    if [[ -z "$pid_list" ]]; then
-        echo "No PIDs provided, no action taken."
-        return 1
-    fi
-
-    for pid in $pid_list; do
-        if echo "$pids" | grep -q -w "$pid"; then
-            sudo kill -9 "$pid" && echo "Process $pid killed." || echo "Failed to kill process $pid."
-        else
-            echo "PID $pid does not match any of the listed processes. Skipping."
-        fi
-    done
+whatdependson() {
+    local search="$1"
+    sudo pacman -Sii "$search" | grep "Required" | sed -e "s/Required By     : //g" | sed -e "s/  /\n/g"
 }
 
-# --- // Sets up zram:
-generate-zramconf() {
-  echo '[zram0]
-  zram-size = ram / 2' | sudo tee /etc/systemd/zram-generator.conf
-  sudo systemctl daemon-reload
-  sudo systemctl start /dev/zram0
+### Custom find cmd
 
+findit() {
+    if [[ -n "$1" ]]; then
+        find . -type f -printf "%TY%Tm%Td\t%p\n" | sort | grep -i "$1"
+    else
+        return 1
+    fi
 }
 
-# --- // List dependencies of pkg: 
-whatdependson()  {
-    search="$1"
-    sudo pacman -Sii $search | grep "Required" | sed -e "s/Required By     : //g" | sed -e "s/  /\n/g"
-    }
+### Backup files in the $PWD
 
-# --- // Backsup archive of pkg typed after:
-f() {
+archive() {
     local target="$1"
-    local backup_dir="${2:-.}"  # Optional second argument to specify backup directory, defaults to current directory
+    local backup_dir="${2:-$PWD/Archive}"
+    mkdir -p "$backup_dir"
 
     if [[ -z "$target" ]]; then
         echo "Error: Please provide a file or directory to back up."
@@ -607,9 +240,11 @@ f() {
         return 1
     fi
 
-    local target_name=$(basename "$target")
-    local timestamp=$(date -u "+%h-%d-%Y_%H.%M%p")
-    local backup_file="${backup_dir}/${target_name}_${timestamp}_backup.tar.gz"
+    local target_name
+    target_name=$(basename "$target")
+    local timestamp
+    timestamp=$(date -u "+%h-%d-%Y_%H.%M%p")
+    local backup_file="${backup_dir}/${target_name}_backup-${timestamp}.tar.gz"
 
     echo "Creating backup for '$target'..."
 
@@ -632,38 +267,107 @@ f() {
     fi
 }
 
-# --- // Move_up_1_directory:
-up() { for _ in $(seq "${1:-1}"); do cd ..; done; }
+### Shortcut for tar archives
 
-# --- // List app :80 connections:
-function con80() {
-  {
-    LANG= ss -nat || LANG= netstat -nat
-  } | grep -E ":80[^0-9]" | wc -l
+tarnow() {
+    local target="$1"
+    local backup_dir="${2:-.}"
+
+    if [[ -z "$target" ]]; then
+        echo "Provide dir to tarball."
+        return 1
+    fi
+
+    if [[ ! -e "$target" ]]; then
+        echo "Error: The target '$target' does not exist."
+        return 1
+    fi
+
+    local target_name
+    target_name=$(basename "$target")
+    local timestamp
+    timestamp=$(date -u "+%m-%d_%I:%M%p")
+    local backup_file="${backup_dir}/${target_name}-${timestamp}.tar.gz"
+
+    echo "Creating tarball for '$target'..."
+
+    ### Check if we have write access to the backup directory and read access to the target
+    if [[ ! -w "$backup_dir" || ! -r "$target" ]]; then
+        echo "Bypassed: permissions."
+        if sudo tar -czvf "$backup_file" "$target"; then
+            echo "Tarball successful: $backup_file"
+        else
+            echo "Error: permissions."
+            return 1
+        fi
+    else
+        if tar -czvf "$backup_file" "$target"; then
+            echo "Tarball: $backup_file"
+        else
+            echo "Error: Failed to compress tarball."
+            return 1
+        fi
+    fi
 }
 
-# --- // List 20 :80 connections: 
-function http20() {
-  sudo tcpdump -i eth0 -tnn dst port 80 -c 1000 | awk -F"." '{print $1"."$2"."$3"."$4}' | sort | uniq -c | sort -nr | head -n 20
+alias untar='sudo tar xvf'
+
+### Custom Delete
+
+rmshred() {
+    if [ -z "$1" ]; then
+        echo "Usage: rmshred <directory>"
+        return 1
+    fi
+    if [ ! -d "$1" ]; then
+        echo "Error: '$1' is not a directory"
+        return 1
+    fi
+
+    echo -n "Are you sure you want to swiftly delete '$1'? (y/N) "
+    read confirm
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+        echo "Aborted."
+        return 1
+    fi
+
+    ### Count the total number of files for progress estimation.
+#    total_files=$(find "$1" -type f | wc -l)
+#    echo "Deleting ${total_files} files in '$1'..."
+
+    ### Delete files using GNU Parallel with a progress bar.
+    find "$1" -type f -print0 | parallel -0 -n 100 rm -f
+
+    ### Remove directories after files have been deleted.
+    find "$1" -depth -type d -exec rmdir {} \; > /dev/null 2>&1
+
+    ### Finally, remove the top-level directory.
+    rm -rf "$1" > /dev/null 2>&1
+
+    echo "Deletion completed for '$1'."
 }
 
-# --- // List 20 SYN connections:
-function syn20() {
-  {
-    LANG= ss -an | awk '/SYN/ {print $5}' \
-    || LANG= netstat -an | awk '/SYN/ {print $5}'
-  } | awk -F: '{print $1}' | sort | uniq -c | sort -nr | head -n20
+psmem() {
+    local count="${1:-5}"
+    echo "Top $count memory-consuming processes:"
+    if ! ps aux --sort=-%mem | awk 'NR==1; NR>1 {print $0}' | head -n $((count + 1)); then
+        echo "Error retrieving memory info."
+        return 1
+    fi
 }
 
-# --- // Sort 100 connections by uptime and occurrences:
-function consume100() {
-  awk '($NF > 60 && $7~/\.php/){print $7}' "$(retlog)" | sort -n | uniq -c | sort -nr | head -n 100
-  # if django website or other website make by no suffix language
-  # awk '{print $7}' "$(retlog)" | sort -n | uniq -c | sort -nr | head -n 100
+pscpu() {
+    local count="${1:-5}"
+    echo "Top $count CPU-consuming processes:"
+    if ! ps aux --sort=-%cpu | awk 'NR==1; NR>1 {print $0}' | head -n $((count + 1)); then
+        echo "Error retrieving CPU info."
+        return 1
+    fi
 }
 
-# --- // Delete 0byte files:
-function d0() {
+### Delete all 0 byte folders
+
+d0() {
     local target_dir="${1:-.}"
     find "$target_dir" -type f -size 0 -print0 | while IFS= read -r -d '' file; do
         read -r -p "Delete '$file'? [y/N] " response
@@ -676,7 +380,591 @@ function d0() {
     done
 }
 
-# --- Python with no venv:
+## Xorg Display______________________________________________________________________________
+
+alias xd='ls /usr/share/xsessions'
+alias xdw="ls /usr/share/wayland-sessions"
+alias xfix='echo "DISPLAY=:0 XAUTHORITY=$HOME/.Xauthority xterm"'
+alias xi='sudo xbps-install'
+alias xr='sudo xbps-remove -R'
+alias xq='xbps-query'
+alias xmerge='xrdb -merge ~/.Xresources'
+
+## Permissions____________________________________________________________________________
+
+## Chmod
+
+alias chown='sudo chown --preserve-root'
+alias chmod='sudo chmod --preserve-root'
+alias chgrp='sudo chgrp --preserve-root'
+alias chgpg='sudo chown -R $USER:$USER ~/.gnupg && sudo chmod 700 ~/.gnupg && sudo chmod 600 ~/.gnupg/*'
+alias chtmp='sudo chown root:root /tmp && sudo chmod 1777 /tmp && sudo mount -o remount,exec /tmp'
+alias lck='sudo chattr +i '
+alias ulck='sudo chattr -i '
+alias chlocal='sudo chown -R $USER:$USER ~/.config ~/.local && echo "Ownership of ~/.config and ~/.local changed to $USER."'
+alias chnpm='sudo chown -R 1000:1000 /home/andro/.npm'
+chpython() {
+    local python_version
+    python_version=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
+
+    local site_packages_dir="/usr/lib/python${python_version}/site-packages"
+
+    if [[ -d "$site_packages_dir" ]]; then
+        echo "Setting ownership to root and permissions to 755 for: $site_packages_dir"
+        if ! sudo chown -R root:root "$site_packages_dir"; then
+            echo "Error: Failed to change ownership for $site_packages_dir."
+            return 1
+        fi
+        if ! sudo chmod -R 755 "$site_packages_dir"; then
+            echo "Error: Failed to set permissions for $site_packages_dir."
+            return 1
+        fi
+        echo "Ownership and permissions set successfully for $site_packages_dir."
+    else
+        echo "Error: Directory $site_packages_dir not found for Python version $python_version."
+    fi
+}
+
+chboot() {
+    if ! sudo chmod -R 755 /boot/efi; then
+        echo "Error: Failed to chmod /boot/efi."
+        return 1
+    fi
+    if ! sudo chown -R root:root /boot/efi; then
+        echo "Error: Failed to chown /boot/efi."
+        return 1
+    fi
+    echo "Boot directory permissions reset appropriately."
+}
+
+chdirs() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: chdirs <directory_path>"
+        return 1
+    elif [[ ! -d "$1" ]]; then
+        echo "Error: '$1' is not a valid directory."
+        return 1
+    fi
+
+    local target_dir="$1"
+    echo "Setting permissions: U+rwx | G+rwx | O+rx for all directories in '$target_dir'..."
+
+    if ! sudo find "$target_dir" -type d -exec chmod 755 {} +; then
+        echo "Error: Failed to set permissions for directories in '$target_dir'."
+        return 1
+    fi
+
+    echo "✔️ All dirs in '$target_dir' set to 755."
+}
+
+chfd() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: chfdirs <file_or_dir_path>"
+        return 1
+    fi
+
+    local target="$1"
+
+    if [[ -f "$target" ]]; then
+        # If it's a file, apply chmod 644
+        echo "Setting permissions: U+rwx | G+rx | O+rx for file '$target'..."
+        if ! sudo chmod 644 "$target"; then
+            echo "Error: Failed to set permissions for file '$target'."
+            return 1
+        fi
+    elif [[ -d "$target" ]]; then
+        # If it's a directory, apply chmod 755 recursively
+        echo "Setting permissions: U+rwx | G+rx | O+rx for all files in directory '$target'..."
+        if ! sudo find "$target" -type f -exec chmod 755 {} +; then
+            echo "Error: Failed to set permissions for files in directory '$target'."
+            return 1
+        fi
+    else
+        echo "Error: '$target' is not a valid file or directory."
+        return 1
+    fi
+
+    echo "✔️ Successfully set permissions to 755 for '$target'."
+}
+
+chandro() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: chandro [-R] <file_or_dir_path>"
+        return 1
+    fi
+
+    # Check if recursive flag is provided
+    local recursive=false
+    if [[ "$1" == "-R" ]]; then
+        recursive=true
+        shift
+    fi
+
+    local target="$1"
+
+    if [[ -z "$target" ]]; then
+        echo "Error: No file or directory specified."
+        return 1
+    fi
+
+    if [[ ! -e "$target" ]]; then
+        echo "Error: '$target' does not exist."
+        return 1
+    fi
+
+    echo "Setting ownership to 'andro:andro' and permissions to 775 for '$target'..."
+
+    # Apply ownership and permissions
+    if [[ "$recursive" == true ]]; then
+        if ! sudo chown -R andro:andro "$target"; then
+            echo "Error: Failed to change ownership for '$target'."
+            return 1
+        fi
+        if ! sudo chmod -R 755 "$target"; then
+            echo "Error: Failed to set permissions for '$target'."
+            return 1
+        fi
+    else
+        if ! sudo chown andro:andro "$target"; then
+            echo "Error: Failed to change ownership for '$target'."
+            return 1
+        fi
+        if ! sudo chmod 755 "$target"; then
+            echo "Error: Failed to set permissions for '$target'."
+            return 1
+        fi
+    fi
+
+    echo "✔️ Successfully set ownership and permissions for '$target'."
+}
+
+chrootuser() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: chrootuser [-R] <file_or_dir_path>"
+        return 1
+    fi
+
+    ### Check if recursive flag is provided
+    local recursive=false
+    if [[ "$1" == "-R" ]]; then
+        recursive=true
+        shift
+    fi
+
+    local target="$1"
+
+    if [[ -z "$target" ]]; then
+        echo "Error: No file or directory specified."
+        return 1
+    fi
+
+    if [[ ! -e "$target" ]]; then
+        echo "Error: '$target' does not exist."
+        return 1
+    fi
+
+    echo "Setting ownership to 'root:root' and adjusting permissions for '$target'..."
+
+    ### Apply ownership and permissions
+    if [[ "$recursive" == true ]]; then
+        if ! sudo chown -R root:root "$target"; then
+            echo "Error: Failed to change ownership for '$target'."
+            return 1
+        fi
+        if ! sudo find "$target" -type d -exec chmod 755 {} +; then
+            echo "Error: Failed to set directory permissions for '$target'."
+            return 1
+        fi
+        if ! sudo find "$target" -type f -exec chmod 644 {} +; then
+            echo "Error: Failed to set file permissions for '$target'."
+            return 1
+        fi
+    else
+        if ! sudo chown root:root "$target"; then
+            echo "Error: Failed to change ownership for '$target'."
+            return 1
+        fi
+
+        ### Set permissions based on type
+        if [[ -d "$target" ]]; then
+            if ! sudo chmod 755 "$target"; then
+                echo "Error: Failed to set permissions for '$target'."
+                return 1
+            fi
+        elif [[ -f "$target" ]]; then
+            if ! sudo chmod 644 "$target"; then
+                echo "Error: Failed to set permissions for '$target'."
+                return 1
+            fi
+        fi
+    fi
+
+    echo "✔️ Successfully set ownership and permissions for '$target'."
+}
+
+## System Admin & Maintenance____________________________________________________________
+
+alias update-grub2='sudo grub-install ... && sudo grub-mkconfig -o /boot/grub/grub.cfg'
+alias update-grub="sudo grub-mkconfig -o /boot/grub/grub.cfg"
+alias grub-mkconfig='sudo grub-mkconfig -o /boot/grub/grub.cfg'
+alias iotop='sudo iotop -o'
+alias addlbin='export PATH=/home/andro/.local/bin:$PATH'
+alias whatkernel="ls /usr/lib/modules"
+alias scr='systemctl -t service -a --state running --no-page --no-legend'
+alias fixnvm='nvm use --delete-prefix v22.13.0 --silent'
+alias fixnode='npm audit fix --force'
+alias fixkeyboard='sudo localectl set-x11-keymap us'
+alias listusers='cut -d: -f1 /etc/passwd | sort'
+alias setlocales='sudo localectl set-locale LANG=en_US.UTF-8'
+alias microcode='grep . /sys/devices/system/cpu/vulnerabilities/*'
+alias audio="pactl info | grep 'Server Name'"
+alias retry='until !!; do :; done'
+
+## Backup and restore /etc/skel
+
+alias bupskel='sudo cp -Rf /etc/skel /var/recover/skel-backup-$(date +"%Y.%m.%d-%H.%M.%S") && echo "Backup of skel made."'
+alias restoreskel='sudo cp -Rf /var/recover/skel-backup-*/. $HOME/ && echo "Restored from latest backup."'
+
+## Copy rc files from /etc/skel
+
+#alias cb='cp /etc/skel/.bashrc ~/.bashrc && exec bash'
+#alias cz='cp /etc/skel/.zshrc ~/.zshrc && echo "Copied."'
+#alias cf='cp /etc/skel/.config/fish/config.fish ~/.config/fish/config.fish && echo "Copied."'
+
+#fixo() {
+#  [[ -d "$1" ]] &&
+#    find "$1" -type d -print0 | xargs -0 chmod 755 && find "$1" -type f -print0 | xargs -0 chmod 644 ||
+#    echo "$1 is not a directory."
+#}
+#fix() {
+#  [[ -d "$1" ]] &&
+#    find "$1" -type d -print0 | xargs -0 chmod 750 && find "$1" -type f -print0 | xargs -0 chmod 640 ||
+#    echo "$1 is not a directory."
+#}
+#fixp() {
+#  [[ -d "$1" ]] &&
+#    find "$1" -type d -print0 | xargs -0 chmod 700 && find "$1" -type f -print0 | xargs -0 chmod 600 ||
+#    echo "$1 is not a directory."
+#}
+
+## Program Specific__________________________________________________________________________________
+
+## Zathura
+
+alias z='zathura --fork'
+
+## Bat
+
+### Instead of `cmd --help` do `help cmd`:
+
+alias bathelp='bat --plain --language=help'
+
+help() {
+    "$@" --help >/dev/null 2>&1 || "$@" -h >/dev/null 2>&1 | bathelp
+}
+
+alias man='batman'
+
+### Parses git syntax
+
+batdiff() {
+    git diff --name-only --relative --diff-filter=d | xargs bat --diff
+}
+
+### Pipe to less
+
+alias batl='bat | less'
+
+## Lf
+
+alias lf='lfub'
+alias ref='shortcuts >/dev/null; source ${XDG_CONFIG_HOME:-$HOME/.config}/shellz/shortcutrc; source ${XDG_CONFIG_HOME:-$HOME/.config}/shellz/shortcutenvrc; source ${XDG_CONFIG_HOME:-$HOME/.config}/shellz/zshnameddirrc'
+
+## Wf-recorder
+
+#alias screenrecord="wf-recorder -a"
+#alias screenrecord2="wf-recorder -a -c h264_vaapi -C aac -d /dev/dri/renderD128 --file=recording.mp4"
+
+## FZF
+
+### Select files from dir and edit
+
+fzscr() {
+    local dir="${1:-/home/git/clone/scr}"
+    local choice
+    choice=$(find "$dir" -mindepth 1 \( -type d -o -executable -type f \) \
+        ! -path '*/.git/*' -printf '%P\n' | sort -r | fzf --preview "cat '$dir/{}'" --preview-window=down:70%)
+    if [ -n "$choice" ]; then
+        if [ -d "$dir/$choice" ]; then
+            echo "Selected directory: $dir/$choice"
+        elif [ -x "$dir/$choice" ]; then
+            echo "Executing $dir/$choice ..."
+            "$dir/$choice"
+        else
+            echo "No script selected or script is not executable."
+        fi
+    else
+        echo "No selection made."
+    fi
+}
+
+## Kmon
+
+alias kmon='sudo kmon --color blue --accent-color 15FFFF --unicode'
+
+## The Silver Searcher
+
+ags() {
+    if [ "$#" -ne 2 ]; then
+        echo "Usage: ags <filename> <search_term>"
+        return 1
+    fi
+    ag --group --stats --color "$2" "$1" | less -R
+}
+
+## FD
+
+### Fd plus hidden minus .git
+
+alias fdnogit='fd --hidden --follow --exclude ".git"'
+
+### Fd plus hidden
+
+alias fdh='fd --hidden --follow'
+
+### Fd 1 level deep
+
+alias fd1='fd --exact-depth=1 --hidden --follow --exclude ".git"'
+
+### Fd with configurable options
+
+fdde() {
+    local case_flag=""
+    local depth_flag=""
+
+    ### Enable case-insensitive search if the first argument is '-i'
+    if [[ "$1" == "-i" ]]; then
+        case_flag="--ignore-case"
+        shift
+    fi
+
+    ### If a pattern is provided, use it; otherwise, display usage message
+    if [ -z "$1" ]; then
+        echo "Usage: fdde [-i] <pattern> [max-depth]"
+        return 1
+    fi
+
+    ### Set the max-depth flag if a second argument is provided
+    if [ -n "$2" ]; then
+        depth_flag="--max-depth $2"
+    fi
+
+    ### Execute fd with the collected flags and the provided pattern
+    fd $case_flag $depth_flag --glob "$1"
+}
+
+## Nxsiv
+
+### Create thumbnails of all vids in a dir
+
+vidt() {
+    local thumb_dir="$HOME/.cache/video_thumbs"
+    mkdir -p "$thumb_dir"
+
+    ### Disable confirmation for rm (using local zsh option)
+    setopt localoptions rmstarsilent
+    rm -f "$thumb_dir"/*
+
+    local videos
+    videos=(*.mp4(N) *.mkv(N) *.avi(N) *.mov(N) *.webm(N) *.flv(N) *.wmv(N))
+
+    if [ ${#videos[@]} -eq 0 ]; then
+        echo "No video files found in the current directory."
+        return 1
+    fi
+
+    for video in "${videos[@]}"; do
+        local thumbnail="$thumb_dir/${video%.*}.jpg"
+        if ! ffmpegthumbnailer -i "$video" -o "$thumbnail" -s 256 2>> "$HOME/.cache/video_thumbs/errors.log"; then
+            echo "Error generating thumbnail for $video"
+        fi
+    done
+
+    nsxiv -t "$thumb_dir"
+}
+
+## Expressvpn Legacy
+
+alias vpnc='sudo expressvpn connect'
+alias vpnd='sudo expressvpn disconnect'
+alias vpns='sudo expressvpn status'
+alias vpnr='sudo expressvpn refresh'
+alias vpnauto='expressvpn autoconnect true'
+alias vpnset='sudo expressvpn preferences set'
+alias vpnl='sudo expressvpn list'
+alias vpnblock='sudo expressvpn preferences set block_all false'
+alias vpnproto='sudo expressvpn protocol lightway_udp'
+
+## Expressvpn Universal App
+
+#alias vpnc='expressvpnctl connect'
+#alias vpnd='expressvpnctl disconnect'
+#alias vpns='expressvpnctl get vpnip && expressvpnctl status'
+#alias vpnl='expressvpnctl get regions'
+#alias vpnnoextras='expressvpnctl set blockAll false'
+#alias vpnproto='expressvpnctl set protocol lightwayudp'
+#alias checkvpn='expressvpnctl get connectionstate && expressvpnctl get dnsconfigured'
+## -------------- Blocking ---------------- ##
+#alias vpnlan='expressvpnctl set allowlan false'
+#alias vpnnolan='expressvpnctl set allowlan true'
+#alias vpnlocknet='sudo expressvpnctl set networklock true'
+#alias vpnunlocknet='sudo expressvpnctl set networklock false'
+## -------------- Tunneling --------------- ##
+#alias vpnton='sudo expressvpnctl set splittunnel true'
+#alias vpntoff='sudo expressvpnctl set splittunnel false'
+#alias vpnbypass='f(){ sudo expressvpnctl set split-app bypass:"$1"; }; f'
+#alias vpnadd='f(){ sudo expressvpnctl set split-app vpn:"$1"; }; f'
+#alias vpnrm='f(){ sudo expressvpnctl set split-app remove:"$1"; }; f'
+## -------------- Fuck The GUI -------------- ##
+#alias vpncli='expressvpnctl background enable'
+
+## Nvim
+
+[ -x "$(command -v nvim)" ] && alias vim="nvim" vimdiff="nvim -d"
+alias magit="nvim -c MagitOnly"
+
+## UFW
+
+alias ufwd='sudo ufw disable'
+alias ufws='sudo ufw status'
+ufwr() {
+    if yes | sudo ufw reset; then :; else echo "Failed to reset ufw"; fi
+    sudo ufw default deny incoming || { echo "Failed to set default deny incoming"; return 1; }
+    sudo ufw default allow outgoing || { echo "Failed to set default allow outgoing"; return 1; }
+    sudo ufw enable || { echo "Failed to enable ufw"; return 1; }
+}
+
+## Micro
+
+alias sm='sudo micro'
+
+## Bleachbit
+
+alias bleachcache='sudo bleachbit --clean system.cache system.localizations system.trash ; sudo paccache -vrk 2 || return 0'
+alias bleachchrome='bleachbit --clean chromium.cache chromium.dom thumbnails.cache'
+
+## Garuda-update
+
+alias garuda-refreshkeys='garuda-update remote keyring'
+alias garuda-reinstallallpkgs='garuda-update remote reinstall'
+alias garuda-resetaudio='garuda-update reset-audio'
+alias garuda-ffmpegupdate='/Nas/Build/git/syncing/scr/installers/ffmpeg/custom_garuda_update.sh'
+
+## Dracut
+
+### This will pipe to sh to execute: "dracutk | sh"
+
+alias dracutzen='echo "sudo dracut --force --kver=$(uname -r) /boot/initramfs-linux-zen.img --enhanced-cpio --early-microcode --fstab && sudo grub-install && sudo grub-mkconfig -o /boot/grub/grub.cfg"'
+alias dracutfallback='echo "sudo dracut --force /boot/initramfs-linux-fallback.img --enhanced-cpio --early-microcode --fstab && sudo grub-install && sudo grub-mkconfig -o /boot/grub/grub.cfg"'
+
+## SSH
+
+alias ssha='eval $(ssh-agent -s) && ssh-add'
+alias sshid='xclip -sel clip < ~/.ssh/id_ed25519.pub'
+#alias cleanssh="sed -i 18d .ssh/known_hosts"
+
+## NTP
+
+alias restartntp='sudo systemctl stop ntpd.service && sudo pacman -Syu ntp'
+alias fixntp='sudo ntpd -qg && sleep 10 && sudo hwclock -w'
+
+## Clipboard
+
+alias paste='wl-paste'
+alias copy='wl-copy <'
+#paste_cmd() {
+#    wl-paste | "$@"
+#}
+#copy_cmd() {
+#    "$@" | wl-copy
+#}
+#alias copy='wl-copy <'
+
+## BTRFS
+
+alias btrfsfs='sudo btrfs filesystem df /'
+alias btrfsli='sudo btrfs su li / -t'
+
+## Snapper
+
+alias snapcroot="sudo snapper -c root create-config /"
+alias snapchome="sudo snapper -c home create-config /home"
+alias snapli="sudo snapper list"
+alias snapcr="sudo snapper -c root create"
+alias snapch="sudo snapper -c home create"
+
+## Oh My ZSH
+
+#alias oz="svim ~/.zshrc"
+#alias oc="cd ~/.oh-my-zsh/custom/"
+#alias omzp="echo -e '\033[1;36mPlugins:\033[0m'; awk -F'=' '/^plugins/{gsub(/[\(\)]/, \"\"); split(\$2, a, \" \"); for(i in a) print a[i]}' ~/.zshrc"
+#alias omzl='omz plugin list'
+#alias omzi='omz plugin info'
+
+## Network____________________________________________________________________________________________
+
+alias restartnetwork='sudo systemctl restart NetworkManager'
+alias restartnetwork2='sudo ip link set down enp2s0 && sudo ip link set up enp2s0'
+fixresolv() {
+    sudo chattr -i /etc/resolv.conf
+    echo -e "nameserver ::1
+nameserver 127.0.0.1
+options edns0 single-request-reopen" | sudo tee /etc/resolv.conf
+    sudo chattr +i /etc/resolv.conf
+}
+
+## List traffic on :80
+
+allports() {
+    local output
+    if output=$(ss -nat 2>/dev/null); then
+        :
+    else
+        output=$(netstat -nat 2>/dev/null)
+    fi
+    echo "$output" | grep -E ":80[^0-9]" | wc -l
+}
+
+## List 20 awk conn :80
+
+httpports() {
+    sudo tcpdump -i eth0 -tnn dst port 80 -c 1000 | awk -F"." '{print $1"."$2"."$3"."$4}' | sort | uniq -c | sort -nr | head -n 20
+}
+
+## List 20 syn conn :80
+
+synports() {
+    local output
+    if output=$(ss -an 2>/dev/null | awk '/SYN/ {print $5}'); then
+        :
+    else
+        output=$(netstat -an 2>/dev/null | awk '/SYN/ {print $5}')
+    fi
+    echo "$output" | awk -F: '{print $1}' | sort | uniq -c | sort -nr | head -n 20
+}
+
+## List 100 conn sorted: uptime, instance sum
+
+consume100() {
+  awk '($NF > 60 && $7~/\.php/){print $7}' "$(retlog)" | sort -n | uniq -c | sort -nr | head -n 100
+  # if django website or other website make by no suffix language
+  # awk '{print $7}' "$(retlog)" | sort -n | uniq -c | sort -nr | head -n 100
+}
+
+## Python____________________________________________________________________________________
+
+### Invoke without virtual environment:
+
 syspip() {
     PIP_REQUIRE_VIRTUALENV="" pip "$@"
 }
@@ -687,64 +975,195 @@ syspip3() {
     PIP_REQUIRE_VIRTUALENV="" pip3 "$@"
 }
 
-# ==================================================================================== // MEDIA:
+## Virtualenv
+
+alias pyvenv='source $XDG_DATA_HOME/virtualenv/bin/activate --prompt 💀'
+alias pyvenvcd='source $XDG_DATA_HOME/virtualenv/bin/activate --prompt 💀 && cd $XDG_DATA_HOME/virtualenv'
+
+## Pyfiglet:
+
+figletbanner() {
+    if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+        echo "Usage: figletc \"your text here\""
+        echo "Generates stylized text using pyfiglet with line_blocks font and cyan color."
+        return
+    fi
+
+    if ! command -v pyfiglet >/dev/null 2>&1; then
+        echo "Error: pyfiglet is not installed. Please install it using pip:"
+        echo "       pip install pyfiglet"
+        return 1
+    fi
+
+    if ! command -v lolcat >/dev/null 2>&1; then
+        echo "Error: lolcat is not installed. Please install it using your package manager:"
+        echo "       sudo pacman -S lolcat"
+        return 1
+    fi
+
+    pyfiglet --font=line_blocks --normalize-surrounding-newlines "$@" | lolcat -F 0.5
+}
+
+## Multimedia________________________________________________________________________________
+
+## W3M
+
+alias w3m='w3m https://yandex.com'
+
+## Wget
+
+alias imgscrape='wget -r -l1 --no-parent -nH -nd -P/tmp -A".gif,.jpg,.png" http://example.com/images'
+alias mirrorsite='wget -m -k -K -E -e robots=off'
+
+## Transmission
 
 alias trem='transmission-remote'
-alias unhblock='hblock -S none -D none'
-alias imgscrape='wget -r -l1 --no-parent -nH -nd -P/tmp -A".gif,.jpg,.png"' http://example.com/images
-alias mirrorsite='wget -m -k -K -E -e robots=off'
+
+## Youtube-Viewer
+
 alias ytt='yt --skip-download --write-thumbnail'
 alias YT='youtube-viewer'
 alias yta='yt -x -f bestaudio/best'
-ytdl() {
-  yt-dlp --add-metadata \
-         --embed-metadata \
-         --external-downloader aria2c \
-         --external-downloader-args "-c -j 3 -x 3 -s 3 -k 1M" \
-         -f "315/313/308/303/302/247/244+bestaudio/best" \
-         --merge-output-format mp4 \
-         --no-playlist \
-         --no-mtime \
-         "$@"
+
+## Mpv
+
+playdir() {
+    if [[ -z "$1" ]]; then
+        echo "No file or directory provided." >&2
+        return 1
+    fi
+    if [[ -d "$1" ]]; then
+        target="$1"
+    else
+        target=$(dirname "$1")
+    fi
+    cd "$target" || return 1
+    mpv --playlist=<(find "$(pwd)" -maxdepth 3 -type f \( \
+          -iname '*.mp4' -o -iname '*.wmv' -o -iname '*.mkv' -o \
+          -iname '*.avi' -o -iname '*.mov' -o -iname '*.mpeg' -o \
+          -iname '*.ts'  -o -iname '*.m4v' -o -iname '*.gif' -o \
+          -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \
+          -iname "*.3gp" \)) --shuffle=yes --loop-playlist=inf \
+	  --input-ipc-server=/tmp/mpvsocket --no-resume-playback
 }
+
+#playdir() {
+#    \ls $PWD > dirplaylist.txt
+#    mpv --playlist=dirplaylist.txt --shuffle=yes --loop=no || rm dirplaylist.txt
+#}
+#alias mpvplaylist='mpv --input-ipc-server=/tmp/mpvsocket --playlist=/home/andro/mpv_playlist.txt'
+
+## Yt-dlp
+
+#ytdl() {
+#  yt-dlp --add-metadata \
+#         --embed-metadata \
+#         --external-downloader aria2c \
+#         --external-downloader-args "-c -j 3 -x 3 -s 3 -k 1M" \
+#         -f "315/313/308/303/302/247/244/137+bestaudio/best" \
+#         --merge-output-format webm \
+#         --no-playlist \
+#         --no-mtime \
+#         "$@"
+#}
+
+#ytf() {
+#    local url="$1"
+#    yt-dlp --list-formats \
+#           "$url"
+#}
+
+#ytp() {
+#  yt-dlp --add-metadata \
+#         --embed-metadata \
+#         --external-downloader aria2c \
+#         --external-downloader-args "-c -j 3 -x 3 -s 3 -k 1M" \
+#         -f "315/313/308/303/302/247/244/137+bestaudio/best" \
+#         --yes-playlist \
+#    --write-playlist-metafiles \
+#    --concat-playlist always \
+#         "$@"
+#}
+
+## FFMPEG
+
+alias mkclip='/home/git/clone/scr/media/ffmpeg-concat $(fzf --multi)'
+
+## Redgifs
 
 reddl() {
-  yt-dlp --external-downloader aria2c \
-         --external-downloader-args "-c -j 3 -x 3 -s 3 -k 1M" \
-	 -o "/home/andro/Downloads/%(title)s.%(ext)s" \
-         "$@"
+    yt-dlp --external-downloader aria2c \
+           --external-downloader-args "-c -j 3 -x 3 -s 3 -k 1M" \
+           -o "/home/andro/Downloads/%(title)s.%(ext)s" \
+           "$@"
 }
 
-alias nm3='function _nm3() {
+## N-m3u8-dl
+
+m3dl() {
     local url="$1"
-    local name="download_$(date +%Y%m%d_%H%M%S)"
-    n-m3u8dl-re "$url" --save-name "$name" --use-ffmpeg-concat-demuxer --thread-count 32 --download-retry-count 5 --auto-select --live-real-time-merge --mux-after-done format=mp4:muxer=ffmpeg:keep=false --tmp-dir "/storage/tmp" --save-dir "/sto2/Downloads"
-}; _nm3'
+    local save_dir="/storage/Downloads"
+    local base_name="m3dl_download"
+    local extension=".mp4"
+    local counter=1
 
-# ====================================================================================== // PACMAN //
+    while [ -e "${save_dir}/${base_name}_${counter}${extension}" ]; do
+        counter=$((counter + 1))
+    done
 
-# --- // Package Manager Utils:
+    local save_name="${save_dir}/${base_name}_${counter}${extension}"
+
+    \n-m3u8dl-re "$url" \
+                --save-name "$save_name" \
+                --use-ffmpeg-concat-demuxer \
+                --thread-count 32 \
+                --download-retry-count 5 \
+                --auto-select \
+                --live-real-time-merge \
+                --mux-after-done format=mp4:muxer=ffmpeg:keep=false \
+                --tmp-dir "/storage/tmp" \
+                --save-dir "$save_dir" \
+                --log-level INFO \
+                -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0" \
+                -H "Referer: https://example.com" \
+                -H "Cookie: sessionid=abc123; other_cookie=value"
+}
+
+## Package Management____________________________________________________________________________
+
+## Pkglist
+
+alias bigpkg="expac -H M '%m\t%n' | sort -h | nl"
+alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
+alias riplong="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -3000 | nl"
+alias gitpkg="pacman -Q | grep -i '\-git' | wc -l"
+alias pkgbysize="expac -Q '%m - %n %v' | sort -n -r"
+alias mkpkglist='cat /tmp/pacui-ls'
+
+## Reflector
+
 alias mirrors='sudo reflector --latest 10 --age 2 --fastest 10 --protocol https --sort rate --save /etc/pacman.d/mirrorlist'
+
+## Pacman:
+
 alias fixpacman='sudo unlink /var/lib/pacman/db.lck'
 alias fixpacman2='sudo unlink /var/cache/pacman/pkg/cache.lck'
 alias cleanpacman="sudo find /var/cache/pacman/pkg/ -iname '*.part' -delete"
 alias checkdb='sudo pacman -Dk'
 alias findpkg='sudo pacman -Fyx'
 alias eol='comm -23 <(pacman -Qqm | sort) <(curl https://aur.archlinux.org/packages.gz | gzip -cd | sort)'
-#alias undo='sudo apt-get remove $(dpkg -l | tail -n +6 | awk "{print $2}")'
 
-# --- // Package Lists:
-alias bigpkg="expac -H M '%m\t%n' | sort -h | nl"
-alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
-alias riplong="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -3000 | nl"
-alias gitpkg="pacman -Q | grep -i '\-git' | wc -l"
-alias pkgbysize="expac -Q '%m - %n %v' | sort -n -r"
-alias mkpkglist='bat /tmp/pacui-ls'
+## Yay
 
-# --- // Package Manger Customization Flags:
-
+#alias yay='yay --builddir "/home/build" --sortby votes'
+#alias yay='yay --answerdiff no --builddir "/home/build" --cleanafter --cleanmenu --sortby votes'
+alias yaydeps='yay --sudoloop --refresh --singlelineresults --sysupgrade --timeupdate --verbose'
+alias yayskip='yay -S --mflags --skipinteg'
+alias yayow='yay -S --overwrite="*" --noconfirm'
+alias trizenskip='trizen -S --skipinteg'
+alias update='sudo pacman -Sy && yay -Su'
 yaysearch() {
-    read -p "Choose a search parameter (1-5): " search_param
+    read -r -p "Choose a search parameter (1-5): " search_param
     case $search_param in
         1) yay --singlelineresults --groups --provides --searchby name ;;
         2) yay --singlelineresults --groups --provides --searchby desc ;;
@@ -754,119 +1173,263 @@ yaysearch() {
         *) echo "Invalid choice. Please choose a number between 1 and 5." ;;
     esac
 }
-alias yay='yay --answerdiff no --builddir "/home/build" --cleanafter --cleanmenu --editmenu --norebuild --noredownload --provides --singlelineresults --sortby votes'
-alias yaydeps='yay --recursive --refresh --singlelineresults --sudoloop --sysupgrade --timeupdate --verbose'
-alias yayskip='yay -S --mflags --skipinteg'
-alias trizenskip='trizen -S --skipinteg'
-alias powerupdate='sudo pacman -Sy && sudo powerpill -Su && paru -Su'
 
-# --- // Unsafe Install (security bypass): 
-alias fninstall="yay -S --needed --cleanafter --cleanmenu --devel --noconfirm --rebuild --refresh --sudoloop --sysupgrade --overwrite='*' --disable-download-timeout --pgpfetch=false --noupgrademenu --removemake --redownload --batchinstall=false --answerclean=yes --answerdiff=no --answeredit=no"
+## Fuckin-Do-It (fn)
 
-# --- // Unsafe Update (security bypass): 
-alias fnupdate='yay -Syyu --noconfirm --disable-download-timeout --noupgrademenu --skipreview --removemake --rebuild --nopgpfetch --nosign --nosigndb --nocheck --bottomup --overwrite="*"'
-
-# --- // Unsafe Removal (dependency bypass): 
+alias fninstall="yay -S --needed --cleanafter --cleanmenu --devel --noconfirm --rebuild --refresh --sudoloop --sysupgrade --overwrite='*' --disable-download-timeout --pgpfetch=false --removemake --redownload --batchinstall=false --answerclean=yes --answerdiff=no --answeredit=no"
+alias fnupdate='yay -Syyu --noconfirm --disable-download-timeout --removemake --rebuild --pgpfetch=false --bottomup --overwrite="*"'
 alias fnremove='yay -Rddn --noconfirm'
 
-# --- // Unsafe Siglevel Manipulation:
-alias pacmansigoff="read -p 'Are you sure you want to disable PGP signature verification? (yes/no): ' answer && \
-if [[ \$answer == 'yes' ]]; then \
-    if sudo cp --preserve=all -f /etc/pacman.conf /etc/pacman.conf.backup; then \
-        sudo sed -i '/^SigLevel/ s/Required/Never/' /etc/pacman.conf && \
-        echo 'PGP signature verification bypassed.'; \
-    else \
-        echo 'Failed to create backup. Aborting.'; \
-    fi; \
-else \
-    echo 'Operation canceled.'; \
-fi"
+## Pacman.conf
 
-alias pacmansigon="if [ -f /etc/pacman.conf.backup ]; then \
-    if sudo cp --preserve=all -f /etc/pacman.conf.backup /etc/pacman.conf; then \
-        sudo rm /etc/pacman.conf.backup && \
-        echo 'PGP signature verification restored.'; \
-    else \
-        echo 'Failed to restore the original pacman.conf. Aborting.'; \
-    fi; \
-else \
-    echo 'Backup file not found. Cannot restore.'; \
-fi"
+pacmansigoff() {
+    read -r -p "Are you sure you want to disable PGP signature verification? (yes/no): " answer
+    if [[ $answer == "yes" ]]; then
+        if sudo cp --preserve=all -f /etc/pacman.conf /etc/pacman.conf.backup; then
+            sudo sed -i '/^SigLevel/ s/Required/Never/' /etc/pacman.conf && echo "PGP signature verification bypassed."
+        else
+            echo "Failed to create backup. Aborting."
+        fi
+    else
+        echo "Operation canceled."
+    fi
+}
+alias pacmansigon="if [ -f /etc/pacman.conf.backup ]; then if sudo cp --preserve=all -f /etc/pacman.conf.backup /etc/pacman.conf; then sudo rm /etc/pacman.conf.backup && echo 'PGP signature verification restored.'; else echo 'Failed to restore the original pacman.conf. Aborting.'; fi; else echo 'Backup file not found. Cannot restore.'; fi"
 
-# ===================================================================================== // GPG //
+## GPG_______________________________________________________________________________________________
 
 alias fixdirmngr='sudo dirmngr </dev/null'
+#alias chgpg='sudo chown -R $(whoami):$(whoami) ~/.gnupg && chmod 700 ~/.gnupg && chmod 600 ~/.gnupg/*'
 alias rmgpg='sudo rm -r /etc/pacman.d/gnupg'
-alias mkgpg="[ -d ~/.gnupg ] || mkdir ~/.gnupg ; cp /etc/pacman.d/gnupg/gpg.conf ~/.gnupg/ ; echo 'done'"
 alias fixpacmankey='sudo pacman -S archlinux-keyring && sudo pacman-key --populate'
+alias fixpacmankey2='gpg-agent --homedir /etc/pacman.d/gnupg --use-standard-socket --daemon'
 #alias fixgpgkey="echo 'keyring /etc/pacman.d/gnupg/pubring.gpg' >> $HOME/.gnupg/gpg.conf && sudo pacman-key --populate archlinux"
 alias gpgkeyserver2="sudo gpg --keyserver hkps://keys.openpgp.org/ --search-keys user-id"
 alias generate-keyserver='gpg --full-generate-key && gpg --import /usr/share/pacman/keyrings/archlinux* && gpg --recv-keys --keyserver hkp://pool.sks-keyservers.net && pacman-key --init && pacman-key --populate archlinux'
-#alias newkeyring='sudo pacman -Syu gnupg $(pacman -Qsq '(-keyring)' | grep -v -i -E '(gnome|python|debian)' | paste -sd " " )" --noconfirm'
-#alias initkeyring='sudo pacman-key --init && sudo pacman-key --populate $(pacman -Qsq '(-keyring)' | grep -v -i -E '(gnome|python|debian)' | sed 's/-keyring//' | paste -sd " " )'
 
-# ==================================================================================== // GIT //
+## GIT________________________________________________________________________________________________
 
-# ---- // Git_clone:
-gclone() {
-    # Check if a repository URL is provided
+alias gstat='git status'
+alias gstash='git stash --all'
+alias gclear='git stash clear'
+alias ghr='git reset --hard'
+alias gfs='git-lfs'
+alias ga='git add'
+#alias gupdate='gcomp && gh tidy && gh setup'
+
+gupdate() {
+  setopt errexit nounset pipefail     # abort on error, no unset vars, fail pipelines
+
+  local mode make_backup keep_backups
+  local source_dir repo_dir target_dir backup_root
+  local rsync_args ssh_keys ts archive backups to_prune msg
+
+  mode="${1:-addonly}"                 # "addonly" or "mirror"
+  make_backup="${2:-false}"            # "true" to tarball before sync
+  keep_backups="${3:-7}"               # how many archives to keep
+
+  source_dir="${HOME}/.config/zsh"
+  repo_dir="/home/git/clone/dotfiles"
+  target_dir="${repo_dir}/home/andro/.config/zsh"
+  backup_root="/Nas/Backups/git"
+
+  rsync_args=(-av --update --progress)
+  if [[ "${mode}" == "mirror" ]]; then
+    rsync_args+=(--delete)
+  fi
+
+  ssh_keys="$(ssh-add -l 2>/dev/null || true)"
+  if [[ -z "${ssh_keys}" ]]; then
+    echo "➡️  Loading SSH key into agent…"
+    ssh-add "${HOME}/.ssh/id_ed25519" \
+      || { echo "❌  Failed to add SSH key. Aborting."; return 1; }
+  fi
+
+  if [[ "${make_backup}" == "true" ]]; then
+    mkdir -p "${backup_root}" \
+      || { echo "❌  Cannot create backup_root. Aborting."; return 1; }
+    ts="$(date +%F_%H%M%S)"
+    archive="${backup_root}/dotfiles_${ts}.tar.gz"
+    echo "🛡️  Creating backup: ${archive}"
+    tar -czf "${archive}" -C "${repo_dir}" . \
+      || { echo "❌  Backup failed. Aborting."; return 1; }
+
+    IFS=$'\n' backups=( $(ls -1t "${backup_root}"/dotfiles_*.tar.gz 2>/dev/null) )
+    if (( ${#backups[@]} > keep_backups )); then
+      to_prune=( "${backups[@]:keep_backups}" )
+      rm -- "${to_prune[@]}" \
+        || echo "⚠️  Failed to prune some old backups."
+    fi
+  fi
+
+  echo "➡️  Starting dotfiles sync (mode=${mode})…"
+  rsync "${rsync_args[@]}" "${source_dir}/" "${target_dir}/" \
+    || { echo "❌  Rsync failed. Aborting."; return 1; }
+
+  echo "➕  Staging new & modified files…"
+  git -C "${repo_dir}" add -u . \
+    || { echo "❌  'git add -u' failed."; return 1; }
+  git -C "${repo_dir}" add . \
+    || { echo "❌  'git add .' failed."; return 1; }
+
+  if git -C "${repo_dir}" diff --cached --quiet; then
+    echo "✅  No changes to commit."
+  else
+    msg="chore(dotfiles): sync zsh @ $(date +%Y%m%d_%H%M%S)"
+    git -C "${repo_dir}" commit -m "${msg}" \
+      || { echo "❌  Commit failed."; return 1; }
+    echo "✔️  Committed: ${msg}"
+  fi
+
+  echo "📤  Pushing to origin/main…"
+  git -C "${repo_dir}" push origin main \
+    || { echo "❌  Git push failed."; return 1; }
+
+  echo "🧹  Running 'gh tidy'…"
+  gh -R 4ndr0666/dotfiles tidy --yes > /dev/null 2>&1 \
+    || { echo "❌  gh tidy failed."; return 1; }
+
+  echo "⚙️  Running 'gh setup'…"
+  gh -R 4ndr0666/dotfiles setup --yes > /dev/null 2>&1 \
+    || { echo "❌  gh setup failed."; return 1; }
+
+  echo "✅  gupdate completed successfully."
+}
+
+
+#gupdate() {
+#    local source_dir="$HOME/.config/zsh/"
+#    local target_dir="/home/git/clone/dotfiles/home/andro/.config/zsh/"
+#    local repo_dir="/home/git/clone/dotfiles/"
+#
+#    echo "Copying updated dotfiles from '${source_dir}' to '${target_dir}'..."
+#    if ! rsync -av --update --progress "${source_dir}"* "${target_dir}"; then
+#        echo "Error: Failed to copy files from ${source_dir} to ${target_dir}."
+#        return 1
+#    fi
+#
+#    if ! cd "${repo_dir}"; then
+#        echo "Error: Failed to change directory to ${repo_dir}."
+#        return 1
+#    fi
+#
+#    if ! gcomp; then
+#        echo "Error: gcomp failed. Aborting workflow."
+#        return 1
+#    fi
+#
+#    if ! gh tidy; then
+#        echo "Error: gh tidy failed."
+#        return 1
+#    fi
+#
+#    if ! gh setup; then
+#        echo "Error: gh setup failed."
+#        return 1
+#    fi
+#}
+
+gignore() {
+    ### Ensure a pattern is provided
+    if [ -z "$1" ]; then
+        echo "Usage: gitignore_add <pattern>"
+        return 1
+    fi
+
+    local pattern="$1"
+    local gitignore_file="$HOME/.gitignore_global"
+
+    ### Create the file if it doesn't exist
+    if [ ! -f "$gitignore_file" ]; then
+        touch "$gitignore_file"
+        echo "Created $gitignore_file"
+    fi
+
+    ### Check if the pattern already exists (exact match)
+    if grep -Fxq "$pattern" "$gitignore_file"; then
+        echo "Pattern '$pattern' already exists in $gitignore_file"
+    else
+        echo "$pattern" >> "$gitignore_file"
+        echo "Added pattern '$pattern' to $gitignore_file"
+    fi
+}
+
+gcl() {
     if [[ -z "$1" ]]; then
         echo "Error: No repository URL provided."
         echo "Usage: gclone <repository-url>"
         return 1
     fi
 
-    # Extract the directory name from the repository URL
     repo_name=$(basename "$1" .git)
 
-    # Check if the directory already exists
     if [[ -d "$repo_name" ]]; then
-        echo "Error: Directory '$repo_name' already exists."
-        return 1
+        read -p "Directory '$repo_name' already exists. Do you want to force clone into it? [y/N]: " confirm
+        if [[ "$confirm" != [yY] ]]; then
+            echo "Clone operation aborted."
+            return 1
+        else
+            echo "Warning: Existing directory will be used."
+        fi
     fi
 
-    # Clone the repository with depth 1
-    if git clone --depth 1 "$@"; then
-        # Change into the newly cloned directory
-        cd "$repo_name" || {
-            echo "Error: Failed to change into directory '$repo_name'."
-            return 1
-        }
+    temp_dir=$(mktemp -d)
+    git clone --depth 1 --filter=blob:none --bare "$1" "$temp_dir" > /dev/null 2>&1
+    repo_size=$(du -sm "$temp_dir" | cut -f1)
+    rm -rf "$temp_dir"
+
+    if [[ "$repo_size" -le 25 ]]; then
+        echo "Small repository detected ($repo_size MB). Performing a full clone."
+        depth_flag=""
+    else
+        echo "Large repository detected ($repo_size MB). Performing a shallow clone with --depth 5."
+        depth_flag="--depth 5"
+    fi
+
+    if git clone $depth_flag "$@"; then
+        cd "$repo_name" || { echo "Error: Failed to change into directory '$repo_name'."; return 1; }
         echo "Successfully cloned and switched to '$repo_name'."
+
+        if [[ -n "$depth_flag" ]]; then
+            read -p "Would you like to fetch more history (convert to full clone)? [y/N]: " fetch_more
+            if [[ "$fetch_more" == [yY] ]]; then
+                git fetch --unshallow
+                echo "Full history fetched."
+            fi
+        fi
     else
         echo "Error: Failed to clone the repository."
         return 1
     fi
 }
 
-# --- // Git_add_all/commit_all/comment/pull/push:
+gpush() {
+        git commit -m "$*"
+        git push origin master
+}
+
 gcomp() {
-    # Check if there are any changes to commit
     if ! git diff-index --quiet HEAD --; then
-        # Gather information about the changes
+
+        ### Gather information about the changes
         added=$(git status --porcelain | grep "^A" | wc -l)
         modified=$(git status --porcelain | grep "^ M" | wc -l)
         deleted=$(git status --porcelain | grep "^D" | wc -l)
 
-        # Generate a commit message based on changes
         commit_message="Auto-commit: ${added} added, ${modified} modified, ${deleted} deleted"
 
-        # Add all changed files to staging
-        git add .
+        git add --all
 
-        # Commit the changes with the generated commit message
         if ! git commit -m "$commit_message"; then
             echo "Error: Commit failed. Aborting."
             return 1
         fi
 
-        # Pull the latest changes from the remote repository
         if ! git pull --rebase; then
             echo "Error: Pull failed. Aborting."
             return 1
         fi
 
-        # Push the changes to the remote repository
         if ! git push; then
             echo "Error: Push failed. Aborting."
             return 1
@@ -879,84 +1442,383 @@ gcomp() {
     fi
 }
 
-# --- // Add_ssh_id:
-gssh() {
+gaddssh() {
     eval "$(ssh-agent -s)"
     ssh-add ~/.ssh/github
     ssh -T git@github.com
 }
 
-# --- // Git_search:
 gsearch() {
-    git exec ag "$1"
+    if command -v ag &> /dev/null; then
+        git exec ag "$1"
+    elif command -v rg &> /dev/null; then
+        git exec rg "$1"
+    else
+        git exec grep -r "$1"
+    fi
 }
 
-# --- // Git_delete_cache:
-rmgitcache() {
-    rm -rf ~/.cache/git
+grmcache() {
+    cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/git"
+    if [[ -d "$cache_dir" ]]; then
+        read -p "Are you sure you want to delete Git cache at $cache_dir? [y/N]: " confirm
+        if [[ "$confirm" == [yY] ]]; then
+            rm -rf "$cache_dir"
+            echo "Git cache deleted."
+        else
+            echo "Git cache deletion aborted."
+        fi
+    else
+        echo "No Git cache found at $cache_dir."
+    fi
 }
 
-# --- // Git_root:
 groot() {
-    cd "$(git rev-parse --show-toplevel)" || exit
+    if git rev-parse --show-toplevel &> /dev/null; then
+        cd "$(git rev-parse --show-toplevel)" || { echo "Error: Failed to change to Git repository root."; return 1; }
+        echo "Moved to Git repository root."
+    else
+        echo "Error: Not inside a Git repository."
+        return 1
+    fi
 }
 
-# --- // Reset_git_remote_to_mine:
 gremote() {
-
-    # Check if the current directory is a Git repository
     if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
         echo "Not a git repository. Please navigate to a git repository and try again."
         return 1
     fi
 
+    printf "Enter your GitHub username (default: 4ndr0666): "
+    read -r username
+    username=${username:-"4ndr0666"}
+
     printf "Enter the repository name: "
-    read -r -p repo_name
+    read -r repo_name
 
-    local url="git@github.com:4ndr0666/${repo_name}.git"
+    local url="git@github.com:${username}/${repo_name}.git"
 
-    git remote remove origin
+    if git remote get-url origin &> /dev/null; then
+        read -p "Are you sure you want to remove the current 'origin' remote? [y/N]: " confirm
+        if [[ "$confirm" != [yY] ]]; then
+            echo "Remote origin removal canceled."
+            return 1
+        fi
+        git remote remove origin
+        echo "Old 'origin' remote removed."
+    fi
 
     git remote add origin "$url"
+    echo "New 'origin' remote set to $url."
 
     git remote -v
 }
 
-# --- // Use_SSH_for_git_auth:
-grepo() {
-    local repo_name commit_msg
+ginit() {
+    local repo_name commit_msg branch_name
     git init
-    echo "Enter the name of the GitHub repository:"
-    read -r -p repo_name
+
+#    printf "Enter your GitHub username (default: 4ndr0666): "
+#    read -r username
+#    username=${username:-"4ndr0666"}
+
+    printf "Enter the name of the GitHub repository: "
+    read -r repo_name
+
     git remote add origin "git@github.com:4ndr0666/${repo_name}.git"
     git add .
-    echo "Enter a commit message for the initial commit (default: 'Initial commit'):"
-    read -r -p commit_msg
-    commit_msg=${commit_msg:-"Initial commit"}  # Use default message if none provided
+
+    echo "Enter a commit message for the initial commit (default: 'Initial commit'): "
+    read -r commit_msg
+
+    commit_msg=${commit_msg:-"Initial commit"}
     git commit -m "$commit_msg"
-    git push -u origin main
+
+    printf "Enter the branch name to push to (default: main): "
+    read -r branch_name
+
+    branch_name=${branch_name:-"main"}
+
+    git push -u origin "$branch_name"
 }
 
+## I/O_____________________________________________________________________________________
 
-# ================================== // POWER // ====================================================
+cleanup_session() {
+    echo "Begining custom shutdown..."
+    # Define the list of processes to check and terminatete
+    processes=("polkit-gnome-authentication-agent-1" "timeshift" "brave-beta" "pacman")
 
+    # Loop through each process and attempt to terminate it gracefully
+    for process in "${processes[@]}"; do
+        if pgrep -x "$process" > /dev/null; then
+            echo "Sending SIGTERM to $process..."
+            sudo pkill -15 -x "$process"
+
+            ### Wait up to 5 seconds for the process to terminate
+            timeout=5
+            counter=0
+            while pgrep -x "$process" > /dev/null && [ $counter -lt $timeout ]; do
+                sleep 1
+                counter=$((counter + 1))
+            done
+
+            if pgrep -x "$process" > /dev/null; then
+                echo "$process did not terminate after SIGTERM. Sending SIGKILL..."
+                sudo pkill -9 -x "$process"
+                sleep 1
+                if pgrep -x "$process" > /dev/null; then
+                    echo "Failed to terminate $process even after SIGKILL."
+                else
+                    echo "$process terminated successfully after SIGKILL."
+                fi
+            else
+                echo "$process terminated gracefully."
+            fi
+        else
+            echo "$process not running."
+        fi
+    done
+
+    ### Clear temporary files or session caches
+    echo "Clearing temporary files and session caches..."
+    sudo rm -rf /tmp/*
+    sudo rm -rf /var/tmp/*
+
+    ### Additional cleanup for user session state or session artifacts (optional)
+    echo "Removing any lingering lock files or session artifacts..."
+    sudo rm -f /run/user/$(id -u)/lock/*
+
+    ### Sync filesystem buffers
+    echo "Syncing filesystem buffers..."
+    sync
+}
+
+alias sdn="cleanup_session && echo 'Shutting down...' && sudo shutdown -h now"
+alias ssr="cleanup_session && echo 'Rebooting...' && sudo reboot -h now"
 alias magic='sudo /usr/local/bin/magic.sh'
 
-# Polkit Check and Cleanup Script
-cleanup_session() {
-    # Check if Polkit is running
-    pgrep -x polkit-gnome-authentication-agent-1 > /dev/null && echo "Polkit running" || echo "Polkit not running"
+## 4ndr0tools_______________________________________________________________________
 
-    # Session cleanup commands
-    pkill -f "polkit-gnome-authentication-agent-1"
-    pkill -f "xdg-desktop-portal"
-    # Add other necessary cleanup commands
-    echo "Session cleanup complete."
+## 4ndr0cht
+
+### Fzf for cheat-sheets in "~/.cheaters/"
+
+cht() {
+    local cheats
+    cheats=("$HOME/.cheater/"*.md)
+    local choice
+    choice=$(printf "%s\n" "${cheats[@]}" | fzf --prompt="Select a cheat sheet: ")
+    [ -n "$choice" ] && bat --language=md "$choice" || echo "No cheat sheet selected."
 }
 
-# Shutdown Alias
-alias sdn="cleanup_session && echo 'Shutting down...' | sudo tee -a /var/log/user_commands.log && sudo shutdown -h now"
+## 4ndr0conf
 
-# Reboot Alias
-alias ssr="cleanup_session && echo 'Rebooting...' | sudo tee -a /var/log/user_commands.log && sudo reboot -h now"
+### modular help function
 
+edit_config() {
+    local file_path="$1"
+    if [[ $file_path ]]; then
+        sudo chattr -i "$file_path"
+        sudo -E nvim "$file_path"
+    else
+        echo "File path not provided."
+    fi
+}
+
+alias svim='edit_config'
+alias valias='edit_config "$ZDOTDIR/aliasrc"'
+alias vfunc='edit_config "$ZDOTDIR/functions.zsh"'
+alias vpac='edit_config /etc/pacman.conf'
+alias vgrub='edit_config /etc/default/grub'
+alias vgrubc='edit_config /boot/grub/grub.cfg'
+alias vmkinit='edit_config /etc/mkinitcpio.conf'
+alias vmirror='edit_config /etc/pacman.d/mirrorlist'
+alias vchaotic='edit_config /etc/pacman.d/chaotic-mirrorlist'
+alias vfstab='edit_config /etc/fstab'
+alias vzpro='edit_config "$ZDOTDIR/.zprofile"'
+alias vbash='edit_config "$HOME/.bashrc"'
+alias vzsh='edit_config "$ZDOTDIR/.zshrc"'
+alias vhosts='edit_config /etc/hosts'
+alias vmpv='edit_config "$XDG_CONFIG_HOME"/mpv/mpv.conf'
+alias vfire='edit_config "$XDG_CONFIG_HOME"/wayfire.ini'
+alias vbar='edit_config "$XDG_CONFIG_HOME"/wayfire/waybar/config'
+alias vhostname='edit_config /etc/hostname'
+
+## Directory Shortcuts_______________________________________________________________________
+
+### modular helper function
+
+goto() {
+    local dir="$1"
+    if [[ -d "$dir" ]]; then
+        cd "$dir" || exit
+    else
+        echo "Directory not found: $dir"
+    fi
+}
+
+## /home:
+
+alias dc='goto ~/Documents'
+alias dl='goto ~/Downloads'
+alias vid='goto ~/Videos'
+alias pic='goto ~/Pictures'
+alias conf='goto ~/.config'
+alias wconf='goto ~/.config/wayfire'
+alias zconf='goto ~/.config/zsh'
+alias mconf='goto ~/.config/mpv'
+alias ob='goto ~/.config/openbox'
+alias obt='goto ~/.config/openbox/themes'
+
+## /storage:
+
+alias s1='goto /storage'
+alias s1dl='goto /storage/Downloads'
+alias s1pic='goto /storage/Pictures'
+alias s1vid='goto /storage/Videos'
+alias streamdir='goto /storage/streamlink'
+
+## /sto2:
+
+alias s2='goto /sto2'
+alias s2dl='goto /sto2/Downloads'
+alias s2pic='goto /sto2/Pictures'
+alias s2vid='goto /sto2/Videos'
+alias gym='goto /sto2/Gym'
+alias jd='goto /sto2/JD'
+
+## Cookie Dir
+
+alias cook='goto /Nas/Nas/Cookie\ Backup\ Restore'
+
+## /23.1
+
+alias edits='goto /23.1/Edits'
+alias cloud='goto /23.1/Thecloud'
+
+## /Nas:
+
+alias nas='goto /Nas'
+alias sandbox='goto /Nas/sandbox'
+
+## /home/git:
+
+alias ngc='goto /home/git/clone'
+alias nnas='goto /home/git/clone/nas'
+alias ndot='goto /home/git/clone/dotfiles'
+alias nbin='goto /home/git/clone/scr'
+alias npkg='goto /Nas/Build/pkgs'
+alias ngpt='goto /home/git/clone/gpt/'
+alias nasc='goto /Nas/Nas/Cookie\ Backup\ Restore'
+
+## System directories:
+
+alias et='goto /etc'
+alias ske='goto /etc/skel'
+alias bin='goto /usr/local/bin'
+alias loc='goto ~/.local'
+alias lbin='goto ~/.local/bin'
+alias cheat='goto ~/.cheater'
+alias lshare='goto ~/.local/share/'
+alias lsrc='goto ~/.local/src/'
+alias cac='goto ~/.cache'
+
+## 4ndr0kill
+
+killit() {
+  emulate -L zsh
+
+  ### Allow optional leading signal number
+  local sig=15
+  if (( $# > 0 )) && [[ $1 =~ ^[0-9]+$ ]]; then
+    sig=$1
+    shift
+  fi
+
+  ### Build an array of process lines (skip header)
+  local entries
+  if (( EUID != 0 )); then
+    entries=("${(@f)$(ps -f -u $EUID | sed 1d)}")
+  else
+    entries=("${(@f)$(ps -ef | sed 1d)}")
+  fi
+
+  ### Let the user select one or more lines via fzf
+  local selected
+  selected=$(printf "%s\n" "${entries[@]}" | fzf -m \
+    --prompt="Select processes to kill (SIG$sig then SIGKILL fallback): " \
+    --header="TAB: multi‑select, ENTER: confirm" \
+    --ansi)
+
+  ### No selection → abort
+  if [[ -z $selected ]]; then
+    print_message INFO "No processes selected."
+    return 1
+  fi
+
+  ### Extract PIDs (second column) into an array
+  local pid_list=("${(@f)$(printf "%s\n" "$selected" | awk '{print $2}')}")
+  (( ${#pid_list} )) || {
+    print_message ERROR "Failed to parse any PIDs."
+    return 1
+  }
+
+  ### Confirm
+  print_message WARNING "About to send SIG$sig to: ${pid_list[*]}"
+  read -q "?Proceed? [y/N]: "
+  echo
+  [[ $REPLY =~ ^[Yy]$ ]] || {
+    print_message INFO "Aborted."
+    return 0
+  }
+
+  ### Send SIGTERM (or chosen signal)
+  for pid in "${pid_list[@]}"; do
+    if kill -"$sig" "$pid"; then
+      print_message INFO "Sent SIG$sig to PID $pid"
+    else
+      print_message ERROR "Failed to send SIG$sig to PID $pid"
+    fi
+  done
+
+  ### Wait up to 5s, then SIGKILL any survivors
+  for pid in "${pid_list[@]}"; do
+    for ((i=1; i<=5; i++)); do
+      kill -0 "$pid" &>/dev/null || break
+      sleep 1
+    done
+
+    if kill -0 "$pid" &>/dev/null; then
+      print_message WARNING "PID $pid still alive—sending SIGKILL"
+      if kill -9 "$pid"; then
+        print_message SUCCESS "SIGKILL succeeded on $pid"
+      else
+        print_message ERROR "Failed to SIGKILL $pid"
+      fi
+    else
+      print_message SUCCESS "PID $pid exited gracefully"
+    fi
+  done
+}
+
+## 4ndr0view
+
+### Quicly view configuration files
+
+alias 00='bat --language=sh --paging=always ~/.config/zsh/aliasrc'
+alias 0f='bat ~/.config/zsh/functions.zsh'
+alias 0z='bat ~/.config/zsh/.zshrc'
+alias 0p='bat ~/.config/zsh/.zprofile'
+
+## Typos___________________________________________________________________________________
+
+### Enter typo followed by the correction:
+
+alias gerp='grep'
+alias shudown='shutdown'
+alias micor='micro'
+alias cpoy='copy'
+alias nvin='nbin'
+alias cay='cat'
+alias reloda='reload'
