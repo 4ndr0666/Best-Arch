@@ -623,11 +623,13 @@ yay --needed --noconfirm libva-intel-driver vulkan-intel libvdpau-va-gl lib32-vu
 Edit  `~/.config/mpv/mpv.conf` to include the following:
 
 ```bash
-#
 # Author: 4ndr0666
 # ================================ // MPV.CONF //
+## Description: This config is tailored for Wayland and an AMD GPU
+# ---------------------------------
 
 ## General
+
 loop-file=inf
 speed=0.50
 hwdec=auto-copy
@@ -645,6 +647,7 @@ no-resume-playback
 # stop-playback-on-init-failure
 
 ## Audio
+
 volume-max=250
 audio-pitch-correction=yes
 af="acompressor=ratio=4,loudnorm"
@@ -655,6 +658,7 @@ video-sync=desync
 #no-audio
 
 ## Window
+
 cursor-autohide=2000
 force-window=immediate
 term-status-msg="Time: ${time-pos}"
@@ -691,6 +695,7 @@ script-opts=osc-layout=bottombar,osc-seekbarstyle=bar
 osc=no
 
 ## Profiles
+
 [playdir]
 profile-desc="Playdir profile..."
 loop-file=no
@@ -744,6 +749,7 @@ window-scale=0.4
 geometry=100%:100%
 
 ## Images
+
 vo-image-format=png
 vo-image-png-compression=4
 vo-image-png-filter=2
@@ -751,6 +757,7 @@ vo-image-outdir="/home/andro/Pictures/screenshots"
 image-display-duration=8
 
 ## Screenshots
+
 screenshot-format=png
 screenshot-png-compression=4
 screenshot-png-filter=2
