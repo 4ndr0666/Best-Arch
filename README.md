@@ -42,7 +42,6 @@ To optimize the package building process, you can enable parallel compilation an
     ```
 
     - Replace `$(nproc)` with your CPU's thread count minus one (e.g., `-j7` for an 8-thread CPU).
-
 2. **Faster Compression with Pigz**:
     - Install `pigz` (Parallel Implementation of Gzip):
 
